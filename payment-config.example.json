@@ -1,0 +1,17 @@
+{
+  "PORT": 8790,
+  "PUBLIC_BASE": "https://你的https域名",
+  "FRONTEND_PAGE": "饮料机_高保真原型.html",
+  "ALLOW_ORIGIN": "*",
+
+  "WX_APPID": "",
+  "WX_MCHID": "",
+  "WX_SERIAL": "",
+  "WX_PRIVATE_KEY_PATH": "./certs/apiclient_key.pem",
+  "WX_APIV3_KEY": "",
+  "WX_APPSECRET": "",
+
+  "ALI_APPID": "",
+  "ALI_PRIVATE_KEY_PATH": "./certs/alipay_app_private.pem",
+  "ALI_PUBLIC_KEY_PATH": "./certs/alipay_public.pem"
+}

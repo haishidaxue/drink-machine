@@ -1,0 +1,8 @@
+{
+  "_说明": "复制本文件为 图片配置.json 并填入真实 Key；或直接用环境变量 ARK_API_KEY。后端优先读环境变量，再读本文件。",
+  "ARK_API_KEY": "你的火山方舟 API Key（控制台 https://console.volcengine.com/ark 创建，豆包 Seedream 出图用）",
+  "ARK_BASE": "https://ark.cn-beijing.volces.com/api/v3",
+  "ARK_IMAGE_MODEL": "doubao-seedream-4-0-250828",
+  "ALLOW_ORIGIN": "*",
+  "PORT": 8788
+}

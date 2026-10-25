@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>AI 饮品出图 · 饮料机</title>
+<style>
+  :root{
+    --pine:#173a2b; --pine2:#1f5139; --leaf:#2f8f63; --gold:#b9914f;
+    --paper:#f6f4ee; --card:#ffffff; --ink:#1d2b22; --ink2:#46604f; --ink3:#83938a;
+    --line:#e7e4da; --wx:#1aa85c; --amber:#b9801f;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+    background:linear-gradient(180deg,#eef2ee,#e7ede8);color:var(--ink);min-height:100vh;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 60px;}
+  header{background:linear-gradient(140deg,var(--pine),var(--pine2));color:#fff;border-radius:20px;
+    padding:22px 22px 20px;box-shadow:0 14px 34px rgba(23,58,43,.25);}
+  header .brand{font-size:13px;opacity:.82;letter-spacing:2px}
+  header h1{font-size:24px;margin:8px 0 6px;font-weight:800}
+  header p{font-size:13px;opacity:.85;line-height:1.6}
+  .card{background:var(--card);border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 6px 20px rgba(30,60,45,.06)}
+  .card h2{font-size:14px;color:var(--ink2);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .card h2 .req{color:var(--wx)}
+  textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 13px;font-size:15px;
+    resize:vertical;min-height:84px;line-height:1.6;color:var(--ink);background:#fcfcfa;outline:none}
+  textarea:focus{border-color:var(--leaf)}
+  input[type=text]{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px;background:#fcfcfa;outline:none}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .chip{border:1px solid var(--line);background:#fcfcfa;color:var(--ink2);border-radius:999px;padding:9px 15px;
+    font-size:13.5px;cursor:pointer;user-select:none;display:flex;align-items:center;gap:6px}
+  .chip.on{background:var(--pine);color:#fff;border-color:var(--pine)}
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:#c7cec8}
+  .chip.on .dot{background:#8be0b4}
+  .seg{display:flex;gap:8px}
+  .seg button{flex:1;border:1px solid var(--line);background:#fcfcfa;border-radius:10px;padding:10px;font-size:14px;color:var(--ink2);cursor:pointer}
+  .seg button.on{background:var(--pine);color:#fff;border-color:var(--pine)}
+  .gen{width:100%;margin-top:16px;border:0;border-radius:14px;padding:16px;font-size:17px;font-weight:800;color:#fff;
+    background:linear-gradient(120deg,var(--leaf),var(--pine2));cursor:pointer;box-shadow:0 10px 24px rgba(31,81,57,.3)}
+  .gen:active{transform:translateY(1px)}
+  .gen[disabled]{opacity:.6}
+  .hint{font-size:12px;color:var(--ink3);margin-top:9px;line-height:1.6}
+  .result{display:none}
+  .result.show{display:block}
+  .imgbox{position:relative;border-radius:14px;overflow:hidden;background:repeating-conic-gradient(#f1efe8 0% 25%,#faf9f4 0% 50%) 50%/18px 18px;min-height:220px;display:flex;align-items:center;justify-content:center}
+  .imgbox img{width:100%;display:block;border-radius:14px}
+  .imgbox img.placeholder{opacity:0;position:absolute}
+  .badge{position:absolute;top:10px;left:10px;background:rgba(20,40,30,.82);color:#fff;font-size:11px;padding:4px 9px;border-radius:999px;backdrop-filter:blur(4px)}
+  .badge.warn{background:rgba(185,128,31,.92)}
+  .loading{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:rgba(252,252,250,.86);border-radius:14px}
+  .loading.show{display:flex}
+  .spinner{width:34px;height:34px;border:3px solid #d8e2db;border-top-color:var(--leaf);border-radius:50%;animation:spin .8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .actions{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+  .abtn{flex:1;min-width:120px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px;font-size:13.5px;color:var(--ink2);cursor:pointer;text-align:center;text-decoration:none}
+  .abtn.primary{background:var(--pine);color:#fff;border-color:var(--pine)}
+  .linkbar{margin-top:11px;background:#f4f6f3;border:1px dashed #cdd8d0;border-radius:10px;padding:9px 11px;font-size:12px;color:var(--ink2);
+    display:flex;align-items:center;gap:8px}
+  .linkbar .u{flex:1;word-break:break-all;font-family:ui-monospace,Menlo,monospace}
+  .copy{border:0;background:var(--wx);color:#fff;border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;white-space:nowrap}
+  details{margin-top:10px}
+  summary{font-size:12px;color:var(--ink3);cursor:pointer}
+  pre{margin-top:8px;background:#f7f8f6;border:1px solid var(--line);border-radius:10px;padding:11px;font-size:11.5px;
+    color:var(--ink2);white-space:pre-wrap;word-break:break-all;line-height:1.6;max-height:180px;overflow:auto}
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:6px}
+  .gitem{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;aspect-ratio:3/4;background:#eee}
+  .gitem img{width:100%;height:100%;object-fit:cover}
+  .gitem .gn{position:absolute;left:0;right:0;bottom:0;padding:14px 8px 7px;font-size:11px;color:#fff;
+    background:linear-gradient(transparent,rgba(0,0,0,.72));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .empty{font-size:12.5px;color:var(--ink3);padding:6px 2px}
+  .settings{font-size:12px;color:var(--ink3)}
+  .settings input{margin-top:6px;font-size:12px}
+  .status{margin-top:8px;font-size:12px}
+  .status.ok{color:#177a43}.status.err{color:#c0392b}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">DRINK MACHINE · IMAGE STUDIO</div>
+    <h1>🍵 AI 饮品出图</h1>
+    <p>与文本 AI 同步：把这杯饮品的名字、文案或顾客的原话贴进来，加上机器里实际有的 4 种原料，一键生成好看、好喝感的商业级饮品图，拿到可直接放进小程序的图片链接。</p>
+  </header>
+
+  <div class="card">
+    <h2>① 这杯饮品的描述 <span class="req">*</span></h2>
+    <textarea id="desc" placeholder="把文本 AI 的输出或顾客的话贴进来，例如：&#10;橙风有信 · 橙香乌龙轻乳茶，清爽提神，前调橙香、中段乌龙、尾韵奶香，适合下午犯困的人。"></textarea>
+    <div class="row">
+      <input type="text" id="name" placeholder="饮品名字（可选，如：橙风有信）" style="flex:1;min-width:200px">
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>② 机器里实际用到的原料（只有这 4 种 + 冰）</h2>
+    <div class="row" id="ings">
+      <div class="chip on" data-k="tea"><span class="dot"></span>东方树叶（茶）</div>
+      <div class="chip" data-k="milk"><span class="dot"></span>牛奶</div>
+      <div class="chip" data-k="c"><span class="dot"></span>水溶C</div>
+      <div class="chip on" data-k="orange"><span class="dot"></span>橙汁</div>
+      <div class="chip on" data-k="ice"><span class="dot"></span>冰块</div>
+    </div>
+    <h2 style="margin-top:16px">温度</h2>
+    <div class="seg" id="temp">
+      <button class="on" data-v="cold">冰饮</button>
+      <button data-v="hot">热饮</button>
+    </div>
+    <div class="row">
+      <input type="text" id="mood" placeholder="情绪/风格关键词（可选，如：高级、清爽、元气、最贵、睡前放松）">
+    </div>
+    <button class="gen" id="genBtn">生成饮品图</button>
+    <div class="hint">每次点「生成」都会出一张全新的图；提示词 = 上面这段文字 + 所选原料，自动统一成商业饮品广告风格，只画饮料本身。机器没有气泡技术，描述里的“气泡”不会被画出来，会改成同样清爽的无气泡冰饮。</div>
+  </div>
+
+  <div class="card result" id="resultCard">
+    <h2>③ 生成结果</h2>
+    <div class="imgbox">
+      <img id="outImg" class="placeholder" alt="生成的饮品图" src="https://img.shields.io/badge/AI-drink-ready-c8d6cd.svg">
+      <div class="loading" id="loading"><div class="spinner"></div><div id="loadTxt">AI 正在调制这杯…</div></div>
+      <div class="badge" id="provider"></div>
+    </div>
+    <div class="linkbar">
+      <span>🔗</span><span class="u" id="imgUrl">—</span>
+      <button class="copy" id="copyUrl">复制链接</button>
+    </div>
+    <div class="actions">
+      <button class="abtn primary" id="regen">🔄 再来一张</button>
+      <a class="abtn" id="openUrl" target="_blank" rel="noopener">↗ 新窗口打开</a>
+      <a class="abtn" id="dlUrl" download="drink.png">⬇ 下载</a>
+    </div>
+    <details>
+      <summary>查看本次提示词</summary>
+      <pre id="promptOut"></pre>
+    </details>
+  </div>
+
+  <div class="card">
+    <h2>历史（本设备本次会话）</h2>
+    <div class="gallery" id="gallery"><div class="empty">还没有生成记录。</div></div>
+  </div>
+
+  <div class="card">
+    <h2>出图服务设置</h2>
+    <div class="settings">
+      出图后端地址（由「图片生成后端_server.js」提供；默认同源或本机 8788）
+      <input type="text" id="srv" placeholder="http://localhost:8788">
+      <div class="status" id="health"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var ings={tea:true,milk:false,c:false,orange:true,ice:true};
+var temp="cold";
+var history=[];
+var lastUrl="",lastPrompt="";
+
+var srvInput=document.getElementById("srv");
+srvInput.value=localStorage.getItem("dm_img_srv")||(location.protocol==="http:"||location.protocol==="https:"?location.origin:"")||"http://localhost:8788";
+srvInput.onchange=function(){localStorage.setItem("dm_img_srv",this.value.trim());health();};
+
+function setStatus(t,cls){var h=document.getElementById("health");h.textContent=t;h.className="status "+(cls||"");}
+function health(){
+  var base=srvInput.value.trim().replace(/\/+$/,"");
+  fetch(base+"/health").then(r=>r.json()).then(j=>{
+    setStatus(j.seedream?("已连接 · 豆包 Seedream（"+j.model+"）"):"已连接 · 公共模型兜底（配置 ARK_API_KEY 后为 Seedream 高清图）","ok");
+  }).catch(()=>setStatus("连不上后端，将用浏览器直连公共出图（国内网络可能失败，建议启动后端）","err"));
+}
+health();
+
+document.querySelectorAll("#ings .chip").forEach(function(ch){
+  ch.onclick=function(){
+    var k=this.getAttribute("data-k");ings[k]=!ings[k];this.classList.toggle("on",ings[k]);
+  };
+});
+document.querySelectorAll("#temp button").forEach(function(b){
+  b.onclick=function(){temp=this.getAttribute("data-v");
+    document.querySelectorAll("#temp button").forEach(x=>x.classList.remove("on"));this.classList.add("on");};
+});
+
+function payload(seed){
+  return {name:document.getElementById("name").value.trim(),
+    desc:document.getElementById("desc").value.trim(),
+    mood:document.getElementById("mood").value.trim(),
+    ingredients:ings,temp:temp,size:"768x1024",seed:seed};
+}
+/* 浏览器侧兜底提示词（后端不可用时直接拼 pollinations）；同样只允许 4 原料、无人物无违规装饰无气泡 */
+var STYLE="a premium custom freshly-made drink in a tall clear plastic takeaway cup, centered, layered gradient liquid, clear ice cubes, a single curled orange peel twist on the rim as the only garnish, soft diffused light, airy misty warm-beige to soft-peach seamless background, subtle blurred green leaves far behind, high-end commercial beverage photography, photorealistic, appetizing, 3:4. STRICTLY drink only: no people, no face, no hands, no woman, no girl, no lime, no lemon slice, no mint, no herb sprig, no rosemary, no flower, no blossom, no petals, no tapioca pearls, no coconut jelly, no coffee, no bubbles, no sparkling water, no soda fizz, still flat beverage, no text, no logo, no watermark";
+var STRIP=["青柠","柠檬片","柠檬","薄荷","香草","迷迭香","百里香","罗勒","气泡","苏打","汽水","雪碧","可乐","带气","加气",
+  "珍珠","椰果","燕麦","椰奶","蜂蜜","奶油","奶盖","咖啡","美式","拿铁","玫瑰","樱花","花朵","花瓣","鲜花","小花","花",
+  "女生","女孩","少女","女人","美女","女神","男生","男孩","男人","帅哥","人物","人像","一个人","一位","模特"];
+function san(s){s=String(s==null?"":s);STRIP.forEach(function(w){s=s.split(w).join("");});return s.replace(/\s+/g," ").trim();}
+function localFallbackURL(pl,seed){
+  var arr=[];
+  if(pl.ingredients.tea)arr.push("clear amber Chinese tea");
+  if(pl.ingredients.milk)arr.push("silky fresh whole milk");
+  if(pl.ingredients.c)arr.push("pale yellow water-soluble vitamin C citrus drink");
+  if(pl.ingredients.orange)arr.push("fresh orange juice");
+  if(pl.ingredients.ice&&pl.temp!=="hot")arr.push("clear ice cubes");
+  var zh=san([pl.name,pl.desc,pl.mood].filter(Boolean).join("，"));
+  var mood=[];var mm=[pl.mood,pl.desc,pl.name].join("");
+  if(/女生|温柔|治愈|精致|优雅/.test(mm))mood.push("soft elegant warm pastel tone");
+  if(/高级|豪华|贵|奢/.test(mm))mood.push("luxurious refined golden accents");
+  if(/清爽|清新|解腻/.test(mm))mood.push("bright clean refreshing clarity");
+  if(/浓郁|丝滑|醇厚|奶香/.test(mm))mood.push("creamy soft white and caramel swirl");
+  var p=(zh?("Chinese flavor note for taste and color only, do not render text or people: "+zh+". "):"")+
+    "show only the beverage, ingredients: "+arr.join(", ")+(mood.length?(", visual mood: "+mood.join(", ")):"")+
+    (pl.temp==="hot"?", hot drink with gentle steam":", iced still drink, no fizz")+", "+STYLE;
+  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(p)+"?width=576&height=768&seed="+seed+"&nologo=true&model=turbo&enhance=true";
+}
+
+function generate(seed){
+  var desc=document.getElementById("desc").value.trim();
+  if(!desc){alert("先贴上文本 AI 的描述或顾客的话（这就是出图提示词的一部分）");return;}
+  var base=srvInput.value.trim().replace(/\/+$/,"");
+  var pl=payload(seed||Math.floor(Math.random()*1e9));
+  var rc=document.getElementById("resultCard");rc.classList.add("show");
+  var img=document.getElementById("outImg"),loading=document.getElementById("loading");
+    img.classList.remove("placeholder");
+  loading.classList.add("show");document.getElementById("loadTxt").textContent="AI 正在调制这杯…";
+  document.getElementById("provider").textContent="";
+  document.getElementById("genBtn").disabled=true;
+
+  function apply(url,provider,prompt,warn){
+    img.onload=function(){
+      loading.classList.remove("show");
+      var pb=document.getElementById("provider");
+      pb.textContent=provider;pb.className="badge"+(warn?" warn":"");
+      document.getElementById("genBtn").disabled=false;
+      lastUrl=url;lastPrompt=prompt;
+      document.getElementById("imgUrl").textContent=url;
+      document.getElementById("openUrl").href=url;document.getElementById("dlUrl").href=url;
+      document.getElementById("promptOut").textContent=prompt;
+      addHistory(url,pl.name||pl.desc.slice(0,12));
+    };
+    img.onerror=function(){
+      loading.classList.remove("show");document.getElementById("genBtn").disabled=false;
+      document.getElementById("loadTxt").textContent="图片加载失败，可点「再来一张」重试";
+    };
+    img.src=url;
+  }
+
+  fetch(base+"/api/image/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(pl)})
+    .then(r=>r.json())
+    .then(j=>{
+      if(j&&j.url){apply(j.url,j.provider==="seedream"?"豆包 · Seedream":"公共模型 · 兜底",j.prompt,j.degraded);}
+      else throw new Error("bad resp");
+    })
+    .catch(()=>{
+      // 后端不可用：浏览器直连公共出图（无 Key 兜底）
+      apply(localFallbackURL(pl,pl.seed),"公共模型 · 浏览器直连",localFallbackURL(pl,pl.seed),true);
+    });
+}
+
+document.getElementById("genBtn").onclick=function(){generate();};
+document.getElementById("regen").onclick=function(){generate(Math.floor(Math.random()*1e9));};
+document.getElementById("copyUrl").onclick=function(){
+  var t=document.getElementById("imgUrl").textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).catch(()=>{
+    var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);
+  });
+  this.textContent="已复制 ✓";var b=this;setTimeout(function(){b.textContent="复制链接";},1400);
+};
+function addHistory(url,name){
+  history.unshift({url:url,name:name||"未命名饮品"});if(history.length>24)history.pop();renderGallery();
+}
+function renderGallery(){
+  var g=document.getElementById("gallery");
+  if(!history.length){g.innerHTML='<div class="empty">还没有生成记录。</div>';return;}
+  g.innerHTML=history.map(function(h){return '<div class="gitem" data-u="'+encodeURIComponent(h.url)+'"><img src="'+h.url+'" alt=""><div class="gn">'+h.name.replace(/[<>&"]/g,"")+'</div></div>';}).join("");
+  g.querySelectorAll(".gitem").forEach(function(it){it.onclick=function(){window.open(decodeURIComponent(this.getAttribute("data-u")),"_blank","noopener");};});
+}
+</script>
+</body>
+</html>

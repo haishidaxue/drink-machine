@@ -1,0 +1,11 @@
+{
+  "_说明": "复制为 文本配置.json 填入真实 Key；或用环境变量 LLM_API_KEY。理解/文案默认走 Kimi K3。",
+  "LLM_PROVIDER": "kimi",
+  "LLM_API_KEY": "你的 Moonshot Kimi API Key（https://platform.moonshot.cn 控制台获取，model=kimi-k3，OpenAI 兼容）",
+  "LLM_MODEL": "kimi-k3",
+  "LLM_BASE_URL": "https://api.moonshot.ai/v1",
+  "ALLOW_ORIGIN": "*",
+  "PORT": 8787,
+  "_可选_豆包": "想用豆包理解模型：LLM_PROVIDER=doubao，LLM_BASE_URL=https://ark.cn-beijing.volces.com/api/v3，LLM_MODEL 填你的豆包文本模型接入点，LLM_API_KEY 填方舟 Key。",
+  "_可选_deepseek": "LLM_PROVIDER=deepseek，LLM_API_KEY 填 DeepSeek Key。"
+}

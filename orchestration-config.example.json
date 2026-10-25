@@ -1,0 +1,20 @@
+{
+  "_说明": "把本文件复制为「饮料机AI配置.json」并填入真实 Key；该文件含密钥，切勿提交到公开仓库或放进小程序前端。也可以不建文件，直接用同名环境变量启动。",
+
+  "PORT": "8790",
+  "ALLOW_ORIGIN": "*",
+
+  "_出图": "大 AI 出图默认走豆包 Seedream（火山方舟）。只需配 ARK_API_KEY 即启用；留空时服务自动降级到免密钥公共出图（仅保活，质量不如豆包）。",
+  "ARK_API_KEY": "",
+  "ARK_BASE": "https://ark.cn-beijing.volces.com/api/v3",
+  "ARK_IMAGE_MODEL": "doubao-seedream-4-0-250828",
+  "_ARK_API_KEY申请": "https://ark.volcengine.com/region:cn-beijing/apikey （注册火山引擎即送免费推理额度；Seedream 4.0 首张免费，之后约0.2元/张）",
+
+  "_文本大脑": "默认 Kimi K3。配 LLM_API_KEY 即启用；若 LLM_PROVIDER 设为 doubao 且文本也走方舟，可只填 ARK_API_KEY、留空 LLM_API_KEY（自动复用方舟 Key）。所有 Key 都留空时用服务内置合规规则兜底，机器不停。",
+  "LLM_PROVIDER": "kimi",
+  "LLM_API_KEY": "",
+  "LLM_MODEL": "kimi-k3",
+  "LLM_BASE_URL": "https://api.moonshot.ai/v1",
+  "_切换豆包文本": "把 LLM_PROVIDER 改成 doubao、LLM_MODEL 改成方舟上的豆包文本模型(如 doubao-pro 系列的 endpoint/model id)、LLM_BASE_URL 改成 https://ark.cn-beijing.volces.com/api/v3，并复用 ARK_API_KEY。",
+  "_切换DeepSeek": "LLM_PROVIDER=deepseek，LLM_MODEL=deepseek-chat，LLM_BASE_URL=https://api.deepseek.com，LLM_API_KEY 填 DeepSeek 的 Key。"
+}
