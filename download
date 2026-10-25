@@ -1,0 +1,36 @@
+# 依赖与构建
+node_modules/
+dist/
+build/
+out/
+.next/
+
+# 日志
+*.log
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Coze 部署绑定（含 app_id/project_id，本地生成，勿提交）
+.coze
+
+# 真实密钥/配置/证书（只保留 *.example.json 模板）
+**/certs/
+*.pem
+*.key
+*.p12
+配置.json
+图片配置.json
+文本配置.json
+支付配置.json
+饮料机AI配置.json
+.env
+.env.*
+!.env.example
