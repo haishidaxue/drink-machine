@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>饮料机 · 高级文案效果样张</title>
+<style>
+  :root{
+    --ink:#2a2620; --ink2:#57503f; --ink3:#8a8272;
+    --paper:#f4efe4; --card:#fbf8f1; --line:#e7e0d0;
+    --pine:#34584a; --pine2:#234035; --gold:#a9843b; --gold2:#c9a55c;
+    --clay:#b05a3c;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Songti SC","Noto Serif SC","Source Han Serif SC",STSong,SimSun,serif;color:var(--ink);
+    background:radial-gradient(1200px 500px at 80% -10%,#efe6d2 0%,var(--paper) 55%);line-height:1.75;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:40px 20px 80px}
+
+  /* 封面 */
+  .hero{text-align:center;padding:34px 18px 10px}
+  .kicker{font-family:-apple-system,"PingFang SC",sans-serif;font-size:12px;letter-spacing:6px;color:var(--gold);text-transform:uppercase}
+  .hero h1{font-size:38px;letter-spacing:4px;margin:14px 0 6px;color:var(--pine2);font-weight:700}
+  .hero .en{font-family:Georgia,serif;font-style:italic;color:var(--ink3);letter-spacing:2px;font-size:14px}
+  .hero p.lead{max-width:600px;margin:18px auto 0;color:var(--ink2);font-size:15px}
+  .rule{width:64px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:22px auto}
+  .only4{display:inline-flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+  .only4 span{font-family:-apple-system,"PingFang SC",sans-serif;font-size:12px;color:var(--pine);background:#eef2ea;border:1px solid #dde6d8;border-radius:99px;padding:4px 13px}
+
+  .sechead{display:flex;align-items:baseline;gap:14px;margin:54px 0 20px}
+  .sechead .no{font-family:Georgia,serif;color:var(--gold2);font-size:15px;letter-spacing:2px}
+  .sechead h2{font-size:24px;letter-spacing:3px;color:var(--pine2)}
+  .sechead .hint{margin-left:auto;font-family:-apple-system,"PingFang SC",sans-serif;font-size:12px;color:var(--ink3)}
+
+  /* AI 定制卡片 */
+  .cup{background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:26px;
+    box-shadow:0 14px 40px -22px rgba(70,60,30,.35)}
+  .cup .top{display:flex;gap:22px;padding:26px 28px 20px;border-bottom:1px dashed var(--line)}
+  .seal{flex:0 0 78px;height:78px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:#f6efdd;font-weight:700;line-height:1.15;text-align:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),0 8px 18px -8px rgba(0,0,0,.4)}
+  .seal small{font-size:10px;letter-spacing:2px;opacity:.85;font-weight:400}
+  .seal b{font-size:22px;letter-spacing:2px;font-weight:700}
+  .s1{background:linear-gradient(150deg,#7ba05b,#3f6b47)} .s2{background:linear-gradient(150deg,#d98a4a,#a8532f)} .s3{background:linear-gradient(150deg,#8a5a9e,#5b3a6b)}
+  .leadline{font-size:15px;color:var(--ink2);font-style:italic;letter-spacing:1px;margin-bottom:6px}
+  .dname{font-size:32px;letter-spacing:6px;color:var(--pine2);font-weight:700}
+  .dname .sub{font-family:Georgia,serif;font-size:13px;letter-spacing:2px;color:var(--gold);font-style:italic;margin-left:10px;letter-spacing:1px}
+  .dprice{margin-left:auto;text-align:right;flex:0 0 auto;align-self:center}
+  .dprice b{font-size:30px;color:var(--clay);font-weight:800}
+  .dprice small{display:block;font-family:-apple-system,"PingFang SC",sans-serif;font-size:11px;color:var(--ink3)}
+  .cup .body{padding:6px 28px 24px}
+  .blk{padding:15px 0;border-bottom:1px solid #f0eadb}
+  .blk:last-child{border-bottom:0}
+  .blab{font-family:-apple-system,"PingFang SC",sans-serif;font-size:11px;letter-spacing:3px;color:var(--gold);margin-bottom:5px;font-weight:700}
+  .ptext{font-size:15.5px;color:var(--ink)}
+  .ptext em{font-style:normal;background:linear-gradient(transparent 62%,rgba(201,165,92,.32) 62%);padding:0 1px}
+  .layers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:4px}
+  .layer{background:#f3eee1;border-radius:12px;padding:12px 14px;font-size:13.5px;color:var(--ink2);position:relative}
+  .layer .ord{font-family:Georgia,serif;color:var(--gold2);font-size:12px;letter-spacing:1px;display:block;margin-bottom:3px}
+  .recipe{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .ing{font-family:-apple-system,"PingFang SC",sans-serif;font-size:12.5px;background:#eef2ea;color:var(--pine);border:1px solid #dde6d8;border-radius:9px;padding:5px 11px}
+  .ing b{color:var(--pine2)}
+  .why-tag{font-family:-apple-system,"PingFang SC",sans-serif;font-size:11px;color:#fff;background:var(--gold);border-radius:6px;padding:1px 7px;margin-right:6px;letter-spacing:1px}
+
+  /* 每日推荐：同一杯，不同日子不同角度 */
+  .daygrid{display:grid;gap:16px}
+  .day{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
+  .day::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gold2)}
+  .day .meta{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .day .date{font-family:-apple-system,"PingFang SC",sans-serif;font-size:12px;color:#fff;background:var(--pine);border-radius:99px;padding:3px 12px;letter-spacing:1px}
+  .day .angle{font-family:-apple-system,"PingFang SC",sans-serif;font-size:12px;color:var(--gold);letter-spacing:2px;font-weight:700}
+  .day .nm{font-size:20px;letter-spacing:3px;color:var(--pine2);font-weight:700}
+  .day p{font-size:15px;color:var(--ink2)}
+  .day p em{font-style:normal;background:linear-gradient(transparent 62%,rgba(201,165,92,.30) 62%)}
+  .day .foot{margin-top:8px;font-family:-apple-system,"PingFang SC",sans-serif;font-size:12px;color:var(--ink3)}
+
+  .note{margin-top:40px;background:#f1ece0;border:1px solid #e4dcc8;border-radius:14px;padding:18px 22px;font-size:13.5px;color:var(--ink2)}
+  .note b{color:var(--pine2)}
+  .note code{font-family:ui-monospace,Menlo,monospace;background:#e6dfcd;padding:1px 6px;border-radius:5px;font-size:12px}
+  @media(max-width:640px){
+    .hero h1{font-size:29px;letter-spacing:2px}
+    .cup .top{flex-wrap:wrap;padding:22px 20px 16px}
+    .dprice{margin-left:0;text-align:left;width:100%}
+    .layers{grid-template-columns:1fr}
+    .cup .body{padding:4px 20px 20px}
+    .sechead .hint{display:none}
+  }
+  @media print{.day,.cup{break-inside:avoid;box-shadow:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">DRINK&nbsp;MACHINE · AI COPYWRITING</div>
+    <h1>会写诗的饮料机</h1>
+    <div class="en">Every cup, written like a short essay.</div>
+    <div class="rule"></div>
+    <p class="lead">顾客说出口的只是一句心情或口味，AI 要做的是补全他没说完的话，为这一杯起一个有出处的名字，讲清为何这样调、入口有几层、好处在哪——而不是一句"按描述调整风味"。</p>
+    <div class="only4" style="margin-top:16px">
+      <span>东方树叶</span><span>水溶 C100</span><span>100% 橙汁</span><span>纯牛奶</span><span>冰</span>
+    </div>
+  </header>
+
+  <!-- ============ AI 定制 ============ -->
+  <div class="sechead">
+    <span class="no">01</span><h2>AI 定制 · 三杯三种写法</h2>
+    <span class="hint">名字含引申义 · 调配有缘由 · 风味有层次 · 只取 4 种原料</span>
+  </div>
+
+  <!-- 杯1 清爽解腻不要奶 -->
+  <article class="cup">
+    <div class="top">
+      <div class="seal s1"><small>AI 现调</small><b>晨青</b></div>
+      <div>
+        <div class="leadline">「天刚擦亮，露水还挂在叶尖，我想把这一刻递给你。」</div>
+        <div class="dname">晨雾青柑<span class="sub">Morning Mist</span></div>
+      </div>
+      <div class="dprice"><b>¥14</b><small>清爽无奶 · 建议正常冰</small></div>
+    </div>
+    <div class="body">
+      <div class="blk">
+        <div class="blab">名字的引申义</div>
+        <div class="ptext">晨雾，是绿茶初泡时那一层似有若无的水汽；青柑，是水溶 C 与橙汁撞出的清亮果酸。合起来是<em>"清晨拨开薄雾、一口见亮"</em>——愿你混沌的午后，也被这样照醒。</div>
+      </div>
+      <div class="blk">
+        <div class="blab"><span class="why-tag">为何这样调</span>调配缘由</div>
+        <div class="ptext">你要清爽、解腻、还特意不要奶，我便把最干净的绿茶做底，让它的清苦先把口腔打开；水溶 C 负责明亮的酸、橙汁补一段圆润的甜，酸甜之间不留任何厚重感，喝完嘴里是轻的。</div>
+      </div>
+      <div class="blk">
+        <div class="blab">风味的三层</div>
+        <div class="layers">
+          <div class="layer"><span class="ord">FIRST · 初口</span>绿茶的清冽先到，像晨雾扑面，舌面一凉。</div>
+          <div class="layer"><span class="ord">MIDDLE · 中段</span>柑橘果酸在两颊化开，提神、生津，腻意被带走。</div>
+          <div class="layer"><span class="ord">FINISH · 回甘</span>收口是一缕极淡的茶香与橙甜，干净不挂喉。</div>
+        </div>
+      </div>
+      <div class="blk">
+        <div class="blab">好处与场景</div>
+        <div class="ptext">零奶、清润、富含维 C。最适合饭后解腻、久坐犯困、或刚从闷热里走出来的那一刻——比白水有滋味，比奶茶没负担。</div>
+        <div class="recipe"><span class="ing">东方树叶·绿茶 <b>180ml</b></span><span class="ing">水溶 C100 <b>120ml</b></span><span class="ing">100%橙汁 <b>60ml</b></span><span class="ing">正常冰</span></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 杯2 最贵浓郁丝滑 -->
+  <article class="cup">
+    <div class="top">
+      <div class="seal s2"><small>AI 现调</small><b>暮橙</b></div>
+      <div>
+        <div class="leadline">「日头沉到山后，把最后一把暖色都揉进了这一杯。」</div>
+        <div class="dname">暮山橙霞<span class="sub">Amber Dusk</span></div>
+      </div>
+      <div class="dprice"><b>¥20</b><small>浓郁丝滑 · 顶级档</small></div>
+    </div>
+    <div class="body">
+      <div class="blk">
+        <div class="blab">名字的引申义</div>
+        <div class="ptext">红茶是暮色里沉稳的山影，橙汁是天边未褪的橙霞，牛奶则是那层缓缓流动的柔光。<em>"暮山橙霞"</em>——把一天收尾时最温柔的颜色，封进杯子里。</div>
+      </div>
+      <div class="blk">
+        <div class="blab"><span class="why-tag">为何这样调</span>调配缘由</div>
+        <div class="ptext">你要最贵、要浓郁丝滑，我选风味最饱满的红茶打底，加大牛奶的比例去撑起醇厚的酒体，再用橙汁点一丝明亮，避免浓得发闷。茶的厚、奶的滑、橙的鲜，三段彼此托住，贵就贵在这份平衡。</div>
+      </div>
+      <div class="blk">
+        <div class="blab">风味的三层</div>
+        <div class="layers">
+          <div class="layer"><span class="ord">FIRST · 初口</span>奶香裹着红茶的焙香，温热、厚实，瞬间被抱住。</div>
+          <div class="layer"><span class="ord">MIDDLE · 中段</span>丝滑在舌尖铺开，茶韵沉稳，甜感温润不齁。</div>
+          <div class="layer"><span class="ord">FINISH · 回甘</span>一缕橙香从尾韵浮起，解了厚重，留干净的回甘。</div>
+        </div>
+      </div>
+      <div class="blk">
+        <div class="blab">好处与场景</div>
+        <div class="ptext">浓郁而不空腻，暖胃又有满足感。适合忙了一天想认真犒劳自己、降温的傍晚，或需要一杯"有分量"的热饮安定下来的时候。</div>
+        <div class="recipe"><span class="ing">东方树叶·红茶 <b>180ml</b></span><span class="ing">纯牛奶 <b>160ml</b></span><span class="ing">100%橙汁 <b>40ml</b></span><span class="ing">少冰/温热</span></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 杯3 加班熬夜提神热的 -->
+  <article class="cup">
+    <div class="top">
+      <div class="seal s3"><small>AI 现调</small><b>夜读</b></div>
+      <div>
+        <div class="leadline">「夜再深，也留一盏不刺眼的灯，陪你把事做完。」</div>
+        <div class="dname">夜阑乌龙<span class="sub">Midnight Oolong</span></div>
+      </div>
+      <div class="dprice"><b>¥16</b><small>提神 · 热饮</small></div>
+    </div>
+    <div class="body">
+      <div class="blk">
+        <div class="blab">名字的引申义</div>
+        <div class="ptext">夜阑，是将尽未尽的深夜；乌龙焙火稳重、回甘绵长，像灯下不肯睡去的那点专注。<em>"夜阑乌龙"</em>，敬所有还在撑着的人——不喧哗，只稳稳托住你。</div>
+      </div>
+      <div class="blk">
+        <div class="blab"><span class="why-tag">为何这样调</span>调配缘由</div>
+        <div class="ptext">加班犯困、又要热的，我用茶味最醒神的乌龙做浓茶底，茶多、奶少，保证提神不被奶香盖过；只加一点牛奶润掉涩感，水溶 C 点一抹酸，让后半程也不平淡。热饮无冰，暖手更暖胃。</div>
+      </div>
+      <div class="blk">
+        <div class="blab">风味的三层</div>
+        <div class="layers">
+          <div class="layer"><span class="ord">FIRST · 初口</span>热乌龙的焙香扑面，一口下去神志先清了一半。</div>
+          <div class="layer"><span class="ord">MIDDLE · 中段</span>淡奶让茶汤变柔，温润不刮喉，适合慢慢续。</div>
+          <div class="layer"><span class="ord">FINISH · 回甘</span>微酸与茶香一起回上来，提神而不心慌，余韵干净。</div>
+        </div>
+      </div>
+      <div class="blk">
+        <div class="blab">好处与场景</div>
+        <div class="ptext">温热、提神、负担轻。专为深夜加班、备考夜读、长途开车前设计——比咖啡温润，比白水有信念感。</div>
+        <div class="recipe"><span class="ing">东方树叶·乌龙 <b>220ml</b></span><span class="ing">纯牛奶 <b>80ml</b></span><span class="ing">水溶 C100 <b>30ml</b></span><span class="ing">热饮无冰</span></div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 每日推荐：同一款，天天角度不同 ============ -->
+  <div class="sechead">
+    <span class="no">02</span><h2>每日推荐 · 同一款，天天不同</h2>
+    <span class="hint">以「金橙轻享」为例 · 不同日期，不同切入角度与深度</span>
+  </div>
+
+  <div class="daygrid">
+    <div class="day">
+      <div class="meta"><span class="date">周一 · 晨</span><span class="angle">角度：唤醒 / 开工</span><span class="nm">金橙轻享</span></div>
+      <p>周一的早晨需要一点<em>被温柔推醒的勇气</em>。绿茶清苦先叫醒神经，橙汁的明亮甜意随即接管情绪——像替你把窗帘一把拉开，让光进来。新的一周，从这一口清爽开始。</p>
+      <div class="foot">切入点：早晨的仪式感与"开工"情绪 · ¥14 · 建议正常冰</div>
+    </div>
+
+    <div class="day">
+      <div class="meta"><span class="date">周三 · 午后</span><span class="angle">角度：解乏 / 续能</span><span class="nm">金橙轻享</span></div>
+      <p>一周走到一半，疲惫往往在午后三点最诚实。这时候不缺甜，缺的是<em>一口把人捞回来的清冽</em>。水溶 C 的酸先提神，绿茶的回甘慢慢续能，零奶不腻，喝完肩膀都轻些。</p>
+      <div class="foot">切入点：周中低谷的"解乏续能" · 与早晨版刻意不重复</div>
+    </div>
+
+    <div class="day">
+      <div class="meta"><span class="date">周五 · 傍晚</span><span class="angle">角度：犒赏 / 松弛</span><span class="nm">金橙轻享</span></div>
+      <p>撑过五天，值得一份不厚重的犒赏。它没有奶茶的负担，却把<em>"终于可以松口气"</em>的心情调进了酸甜里——橙香是小小的庆祝，茶味是稳稳的收尾。敬周末，也敬认真了一周的你。</p>
+      <div class="foot">切入点：周五傍晚的犒赏与松弛 · 情绪、用典、句式均与前两天不同</div>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>这套效果怎么来 / 怎么落地：</b><br>
+    1. 上述每张卡片由一个结构化文案模型一次性产出 <code>lead 引言 / name 名 / meaning 引申义 / why 调配缘由 / layers 三层风味 / benefit 好处 / recipe 配方毫升 / price 定价</code>，文字要求"当作一篇文章写"，每次都现生成，不套固定话术。<br>
+    2. 每日推荐按<b>日期 + 当天轮换的"角度"</b>（唤醒 / 解乏 / 犒赏 / 独处 / 重逢…）生成并按天缓存，所以同一杯在不同日子，角度、深度、句子都不同。<br>
+    3. 原料在服务端白名单锁死为这 4 种，模型写出任何别的料都会被拦截重写。<br>
+    4. 正式由 <b>DeepSeek（deepseek-chat，按量付费、无需会员）</b>实时生成；本页为达到此标准的效果样张。接入你自己的 Key 后，小程序 AI 卡片与每日推荐就按这个版式与水准实时产出。
+  </div>
+
+</div>
+</body>
+</html>

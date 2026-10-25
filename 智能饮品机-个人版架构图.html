@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>智能饮品配置机 · 个人版架构图</title>
+<style>
+:root{
+  --bg:#f6f4f1; --paper:#ffffff; --ink:#2c2826; --muted:#8a8079; --line:#ece7e1;
+  --accent-deep:#b3596f; --accent:#d9708f; --accent-soft:#fbeef2; --accent-line:#f0cdd8;
+  --sage-deep:#3d6b53; --gold:#c79a3a; --sky:#4b92e4; --chili:#e4514a;
+  --shadow:0 10px 30px -16px rgba(60,40,45,.28); --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:radial-gradient(1200px 600px at 80% -10%,#fdf0f4 0%,var(--bg) 55%);
+  color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;padding:0 0 64px;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px;}
+header.hero{padding:54px 0 26px;border-bottom:1px solid var(--line);}
+.kicker{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.22em;color:var(--accent-deep);
+  background:var(--accent-soft);border:1px solid var(--accent-line);padding:5px 14px;border-radius:999px;font-weight:600;}
+h1{font-size:34px;line-height:1.25;margin:18px 0 10px;letter-spacing:.5px;}
+h1 .em{color:var(--accent-deep);}
+.lead{color:var(--muted);font-size:15.5px;max-width:780px;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+.chip{font-size:12.5px;color:var(--accent-deep);background:var(--paper);border:1px solid var(--accent-line);
+  border-radius:999px;padding:6px 14px;box-shadow:0 2px 8px -6px rgba(0,0,0,.2);}
+.urlcard{margin-top:18px;display:inline-flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);
+  border-left:4px solid var(--accent);border-radius:12px;padding:11px 18px;box-shadow:var(--shadow);font-size:13.5px;}
+.urlcard code{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--accent-deep);font-size:13px;}
+
+.layer{margin-top:26px;}
+.layer-h{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.layer-h .no{width:26px;height:26px;border-radius:8px;background:var(--accent-deep);color:#fff;font-size:13px;
+  display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;}
+.layer-h h2{font-size:17px;letter-spacing:.04em;}
+.layer-h .tag{font-size:11.5px;color:var(--muted);border:1px dashed var(--accent-line);border-radius:6px;padding:2px 9px;}
+.cards{display:grid;gap:12px;}
+.cards.g4{grid-template-columns:repeat(4,1fr);}
+.cards.g3{grid-template-columns:repeat(3,1fr);}
+.cards.g2{grid-template-columns:repeat(2,1fr);}
+.node{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px 15px;box-shadow:0 6px 18px -14px rgba(60,40,45,.35);}
+.node h3{font-size:14.5px;margin-bottom:4px;display:flex;align-items:center;gap:7px;}
+.node p{font-size:12.5px;color:var(--muted);line-height:1.55;}
+.node .ico{width:26px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent-deep);
+  display:inline-flex;align-items:center;justify-content:center;font-size:14px;flex:none;}
+.node.entry{border-top:3px solid var(--accent);}
+.node.page{border-top:3px solid #e0a0b3;}
+.node.engine{border-top:3px solid var(--gold);}
+.node.data{border-top:3px solid var(--sky);}
+.sub{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+.sub i{font-style:normal;font-size:11px;background:#fbf6f8;color:var(--accent-deep);border:1px solid var(--accent-line);
+  border-radius:6px;padding:2px 8px;}
+.sub i.warn{background:#fdf1f1;color:#b5423d;border-color:#f0c4c1;}
+.sub i.gold{background:#fbf4e3;color:#9a7423;border-color:#e9d6a6;}
+.sub i.sky{background:#eef5fe;color:#2f6db5;border-color:#c6ddf6;}
+.flowarrow{text-align:center;color:var(--accent);font-size:18px;line-height:1;margin:10px 0 2px;}
+.flowarrow span{font-size:11px;color:var(--muted);display:block;margin-top:2px;letter-spacing:.1em;}
+.taste{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+.taste i{font-style:normal;font-size:11.5px;display:inline-flex;align-items:center;gap:5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;}
+.taste i::before{content:"";width:11px;height:11px;border-radius:50%;border:2px solid rgba(0,0,0,.12);}
+.taste .t-sour::before{background:#f5c53a;}.taste .t-sweet::before{background:#f7a3c2;}
+.taste .t-bitter::before{background:#5cb36a;}.taste .t-spicy::before{background:#e4514a;}
+.taste .t-salty::before{background:#4b92e4;}
+.store{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;}
+.cyl{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 6px 18px -14px rgba(60,40,45,.35);}
+.cyl .cap{background:var(--accent-deep);color:#fff;padding:9px 14px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.cyl .cap code{font-size:10.5px;font-weight:500;color:#f6d9e1;overflow-wrap:anywhere;}
+.cyl .bd{padding:11px 14px;font-size:12.5px;color:var(--muted);}
+.cyl .bd b{color:var(--ink);font-weight:600;}
+.note{margin-top:14px;font-size:12.5px;color:var(--muted);background:#fff;border-left:3px solid var(--gold);
+  border-radius:8px;padding:11px 15px;box-shadow:0 4px 14px -12px rgba(0,0,0,.3);}
+.sec-title{font-size:20px;margin:46px 0 6px;letter-spacing:.03em;}
+.sec-sub{color:var(--muted);font-size:14px;margin-bottom:18px;}
+.deploy{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);}
+.deploy h3{font-size:15px;margin-bottom:4px;}
+.deploy .url{font-size:12.5px;color:var(--accent-deep);word-break:break-all;font-family:ui-monospace,Menlo,Consolas,monospace;}
+.deploy ul{list-style:none;margin-top:12px;}
+.deploy li{font-size:12.8px;color:var(--muted);padding:7px 0 7px 20px;position:relative;border-top:1px dashed var(--line);}
+.deploy li:first-child{border-top:0;}
+.deploy li::before{content:"▸";position:absolute;left:2px;color:var(--accent);}
+.deploy li b{color:var(--ink);}
+.shared{background:linear-gradient(135deg,#fdf3f6,#f9e9ef);border:1px solid var(--accent-line);border-radius:var(--r);padding:20px;margin-top:14px;}
+.shared h3{font-size:15px;color:var(--accent-deep);margin-bottom:12px;}
+.shared .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;}
+.shared .item{background:#fff;border:1px solid var(--accent-line);border-radius:11px;padding:11px 13px;}
+.shared .item b{font-size:13px;display:block;margin-bottom:2px;}
+.shared .item span{font-size:11.8px;color:var(--muted);}
+footer{margin-top:54px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+@media (max-width:860px){.cards.g4{grid-template-columns:repeat(2,1fr);}.cards.g3{grid-template-columns:1fr;}h1{font-size:27px;}}
+@media (max-width:520px){.cards.g4,.cards.g2{grid-template-columns:1fr;}}
+@media print{body{background:#fff;}.node,.cyl,.deploy,.shared{box-shadow:none;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="kicker">PERSONAL · 个人专属调配</span>
+    <h1>智能饮品配置机 · <span class="em">个人版 v2</span> 架构图</h1>
+    <p class="lead">零 Key、零后端的纯静态单文件站点。打开链接先到入口菜单，在对话里说偏好、管原料；AI 配比用 3D 高脚杯呈现风味占比，可“记住我的偏好”，点开始直接出成品、无需付款。所有数据存在本机浏览器。</p>
+    <div class="urlcard">🔗 公开链接 <code>https://q74x4msctf.page.coze.site</code></div>
+    <div class="hero-meta">
+      <span class="chip">BUILD_MODE = personal</span>
+      <span class="chip">入口菜单 personalHome</span>
+      <span class="chip">五味高脚杯</span>
+      <span class="chip">记住偏好 · 免付款</span>
+      <span class="chip">四格原料库 + grid.html</span>
+    </div>
+  </header>
+
+  <!-- 1 入口层 -->
+  <section class="layer">
+    <div class="layer-h"><span class="no">1</span><h2>入口层</h2><span class="tag">启动直达 personalHome</span></div>
+    <div class="cards g2">
+      <div class="node entry"><h3><span class="ico">🧋</span>个人版首页 personalHome</h3>
+        <p>打开链接即进入入口菜单，两张功能卡片；卡片显示当前已备 n / 4 种原料。</p>
+        <div class="sub"><i>#goMix → 01 配比</i><i>#goDb → 02 数据库修改</i></div>
+      </div>
+      <div class="node entry"><h3><span class="ico">↩️</span>菜单返回 resetToPersonalHome</h3>
+        <p>配比页 / 原料库页底部「菜单」键统一清空对话栈、回到入口。</p>
+        <div class="sub"><i>#sideHome</i></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="flowarrow">▼<span>两条主路径</span></div>
+
+  <!-- 2 页面层 -->
+  <section class="layer">
+    <div class="layer-h"><span class="no">2</span><h2>页面 / 视图层</h2><span class="tag">T 模板字典 + go(name) 栈式导航，单页无刷新</span></div>
+    <div class="cards g4">
+      <div class="node page"><h3><span class="ico">💬</span>01 配比 personalAi</h3>
+        <p>聊天式偏好调配，左品牌栏（月牙图）+ 右对话流。</p>
+        <div class="sub"><i>#chatlist</i><i>#chatinput / #chatsend</i></div>
+      </div>
+      <div class="node page"><h3><span class="ico">🗄️</span>02 数据库修改 personalDb</h3>
+        <p>聊天式管理四格原料，用户只见对话、不见原始库；左森林 / 右天空背景。</p>
+        <div class="sub"><i>_dbReply 本地 NLP</i><i>#sideGrid 四格表弹窗</i><i>#sideHome 回菜单</i></div>
+      </div>
+      <div class="node page"><h3><span class="ico">🍷</span>AI 配比结果卡 aiPrevHTML</h3>
+        <p>3D 高脚杯风味占比 + 五味图例；横排三个按钮。</p>
+        <div class="sub"><i>拒绝</i><i>#aiSavePref 记住我的偏好</i><i>开始 → 直接出成品</i></div>
+        <div class="taste"><i class="t-sour">酸 · 黄</i><i class="t-sweet">甜 · 粉</i><i class="t-bitter">苦 · 绿</i><i class="t-spicy">辣 · 红</i><i class="t-salty">咸 · 蓝</i></div>
+      </div>
+      <div class="node page"><h3><span class="ico">✅</span>成品 personalDone</h3>
+        <p>跳过支付直接出成品；可进调配记录，一键重做同一杯。</p>
+        <div class="sub"><i>personalFinish()</i><i>personalHistory</i></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="flowarrow">▼<span>对话 / 按钮触发核心能力</span></div>
+
+  <!-- 3 引擎层 -->
+  <section class="layer">
+    <div class="layer-h"><span class="no">3</span><h2>核心引擎层</h2></div>
+    <div class="cards g3">
+      <div class="node engine"><h3><span class="ico">🧠</span>口味理解（双轨）</h3>
+        <p>默认离线本地规则即可用；联网时走 DRINKAI / TEXTAI 增强文案。</p>
+        <div class="sub"><i class="gold">parseTasteIntent 否定 / 程度 / 独占</i><i>applyMods</i><i class="warn">applyHardBans「不要茶」全篇无茶</i><i class="warn">辣咸默认绝不放、明说才进杯</i></div>
+      </div>
+      <div class="node engine"><h3><span class="ico">📥</span>下单管线 send()</h3>
+        <p>每杯按固定顺序计算，保证偏好与忌口都生效。</p>
+        <div class="sub"><i>resetCst</i><i>applySavedPref()</i><i>applyMods</i><i>applyHardBans</i><i>出结果卡</i></div>
+      </div>
+      <div class="node engine"><h3><span class="ico">🍷</span>风味可视化</h3>
+        <p>按真实配方权重归一化到 100%，自底向上填进 3D 杯，总和恒为 100。</p>
+        <div class="sub"><i class="gold">gobletSVG 郁金香型红酒杯</i><i>buildFlavor / flavorPct</i></div>
+      </div>
+      <div class="node engine"><h3><span class="ico">🖼️</span>出图</h3>
+        <p>staticPick 按成分选预置 Seedream 真图并公平轮转。</p>
+        <div class="sub"><i>STATIC_IMG 本地兜底</i><i class="warn">液体只许茶褐 / 奶白 / 橙 / 浅黄</i></div>
+      </div>
+      <div class="node engine"><h3><span class="ico">🗃️</span>原料库 NLP _dbReply</h3>
+        <p>自动判断 增 / 删 / 改 / 查；多原料一次说全加并逐格报位置，任意正经名词都收。</p>
+        <div class="sub"><i>_extractIngredients 长别名归一</i><i class="warn">超量一个都不加并反问</i><i>满 4 提示先删或换</i></div>
+      </div>
+      <div class="node engine"><h3><span class="ico">❤️</span>偏好系统 PERSONAL</h3>
+        <p>「记住我的偏好」存为每杯默认基底；对话里临时说的只覆盖当次。</p>
+        <div class="sub"><i>savePref / getPref / calcRec</i><i>flavorToast 已记住提示</i></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="flowarrow">▼<span>读写浏览器本地（同源 localStorage）</span></div>
+
+  <!-- 4 数据层 -->
+  <section class="layer">
+    <div class="layer-h"><span class="no">4</span><h2>数据 / 存储层</h2><span class="tag">全部 localStorage，无服务器、无数据库</span></div>
+    <div class="store">
+      <div class="cyl"><div class="cap">四格原料库<code>four_slot_storage_v1</code></div>
+        <div class="bd"><b>x1y1 / x1y2 / x2y1 / x2y2</b> 四槽原料；INGDB 适配器负责读写、空位、按名/按位增删；旧键 <code>dm_home_ingdb_v1</code> 自动迁移。</div></div>
+      <div class="cyl"><div class="cap">个人偏好<code>drink_machine_*(pref)</code></div>
+        <div class="bd"><b>milk / sugar / orange / temp</b>：记住的默认口味，作为每杯起点。</div></div>
+      <div class="cyl"><div class="cap">调配历史<code>drink_machine_*(hist)</code></div>
+        <div class="bd">每杯<b>名称 / 描述 / 图 / 设置</b>快照，支持一键重做与“上次那杯”召回。</div></div>
+    </div>
+    <div class="note">同源同步：四格库页面 <b>grid.html</b> 与小程序同域部署、共用 <code>four_slot_storage_v1</code>；对话增删改、页内四格表弹窗、grid.html 三者双向同步。跨子域 localStorage 被浏览器同源策略禁止，因此不能直连外部网址上的库。</div>
+  </section>
+
+  <!-- 部署拓扑 -->
+  <h2 class="sec-title">部署与文件拓扑</h2>
+  <p class="sec-sub">一个静态目录 = 一个 coze.site 应用，随包图片无外链依赖。</p>
+  <div class="deploy">
+    <h3>个人版 v2 静态应用</h3>
+    <div class="url">https://q74x4msctf.page.coze.site</div>
+    <ul>
+      <li><b>index.html</b>：主小程序，单文件含全部 HTML/CSS/JS（入口菜单 / 配比 / 原料库 / 成品 / 记录）</li>
+      <li><b>grid.html</b>：同域四格原料库表，可视化直接改四格，与对话双向同步</li>
+      <li><b>images/</b>：月牙、森林、天空背景与预置饮品真图</li>
+      <li><b>localStorage</b>：四格原料库 / 个人偏好 / 调配历史 —— <b>无支付、无订单、无账本</b></li>
+      <li><b>.coze</b>：绑定 project_id / app_id，经 coze-dev Pages 部署</li>
+    </ul>
+  </div>
+
+  <!-- 共用底座 -->
+  <div class="shared">
+    <h3>🔧 与商用版同源的技术底座</h3>
+    <div class="grid">
+      <div class="item"><b>BUILD_MODE 编译常量</b><span>同一份代码编译，personal 决定启动页与功能裁剪</span></div>
+      <div class="item"><b>栈式导航</b><span>T 模板 + go(name) + stack 入栈/出栈</span></div>
+      <div class="item"><b>ctx / cst 上下文</b><span>当前饮品、图片、档位与温度，每杯快照防串名</span></div>
+      <div class="item"><b>零 Key / 零后端</b><span>离线 NLP 保证可用，数据全在本机浏览器</span></div>
+      <div class="item"><b>预置真图兜底</b><span>images/ 随站打包，无外网图片依赖</span></div>
+      <div class="item"><b>3D 高脚杯引擎</b><span>gobletSVG + flavorPct，与商用版同一套绘制</span></div>
+    </div>
+  </div>
+
+  <footer>
+    <span>智能饮品配置机 · 个人版 v2 系统架构图</span>
+    <span>零 Key · 纯静态 · 单文件 · 数据存于本机浏览器</span>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!-- pages/index/index.wxml -->
+<view class="wrap">
+  <!-- 主页 -->
+  <view class="hero">
+    <view class="brand">🍵 渴了吗</view>
+    <view class="title">购买 AI 现调饮料</view>
+    <view class="sub">一杯懂你的好茶 · 本机 A08</view>
+  </view>
+
+  <!-- 商品选择（演示：与高保真原型一致的几款） -->
+  <view class="sec-title">选择饮品</view>
+  <view class="drink-list">
+    <view wx:for="{{drinks}}" wx:key="id"
+          class="dcard {{currentId===item.id?'on':''}}"
+          data-id="{{item.id}}" bindtap="pickDrink">
+      <view class="dname">{{item.name}}</view>
+      <view class="ddesc">{{item.desc}}</view>
+      <view class="dprice">¥{{item.price}}</view>
+    </view>
+  </view>
+
+  <view class="sec-title">奶 / 糖</view>
+  <view class="seg">
+    <view wx:for="{{milkTypes}}" wx:key="v"
+          class="seg-item {{mtype===item.v?'on':''}}"
+          data-v="{{item.v}}" bindtap="setMtype">{{item.label}}</view>
+  </view>
+
+  <view class="total">合计 <text class="total-n">¥{{total}}</text></view>
+
+  <button class="paybtn" loading="{{paying}}" disabled="{{paying}}" bindtap="onPay">
+    微信支付 ¥{{total}}
+  </button>
+  <view class="note">点击后在<b>本页面</b>直接唤起微信支付，指纹/面容/密码由微信验证</view>
+
+  <!-- 支付成功 / 出餐 -->
+  <view wx:if="{{paid}}" class="done-mask">
+    <view class="done-card">
+      <view class="done-check">✓</view>
+      <view class="done-t">支付成功 · 正在出餐</view>
+      <view class="done-c">凭订单码取餐：{{paidOrder.code}}</view>
+      <button class="done-btn" bindtap="closeDone">完成</button>
+    </view>
+  </view>
+</view>

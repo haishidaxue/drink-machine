@@ -1,0 +1,5 @@
+/* app.wxss —— 全局视觉 */
+page{background:#eef2ee;color:#1d2b22;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;}
+.safe{padding:calc(env(safe-area-inset-bottom) + 16rpx);}
+.btn-primary{background:linear-gradient(120deg,#1f7a55,#126042);color:#fff;border-radius:999rpx;font-size:32rpx;}
+.btn-primary[disabled]{opacity:.6;}

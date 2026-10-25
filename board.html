@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="zh-CN"><head><!-- Coze Coding Analytics -->
+
+<!-- WebPro SDK -->
+
+
+
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>商用原料库·四格</title>
+<link rel="stylesheet" href="board.css">
+</head>
+<body>
+
+<header class="topbar">
+  <h1>商用原料库·四格</h1>
+</header>
+
+<main class="wrap">
+  <section class="card">
+    <div class="card-title">商用原料库·四格（只存 4 个格子当前放的配料）</div>
+    <div class="status">
+      <span>坐标固定不可改，右侧内容点一下就能填 / 改，自动保存在本浏览器</span>
+      <span class="saved-tip" id="savedTip">已保存</span>
+    </div>
+    <div class="table-wrap">
+      <table id="t">
+        <thead>
+          <tr>
+            <th style="width:180px">格子坐标</th>
+            <th>存储内容（当前放的配料）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="coord">x1y1</td><td class="cell" contenteditable="true" data-key="x1y1"></td></tr>
+          <tr><td class="coord">x1y2</td><td class="cell" contenteditable="true" data-key="x1y2"></td></tr>
+          <tr><td class="coord">x2y1</td><td class="cell" contenteditable="true" data-key="x2y1"></td></tr>
+          <tr><td class="coord">x2y2</td><td class="cell" contenteditable="true" data-key="x2y2"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">说明：本表只存储四个格子当前内容，支持外部（网页端）直接修改写入。</div>
+  </section>
+  <div class="ops">
+    <button type="button" id="btnReset">清空全部内容</button>
+  </div>
+  <footer>商用原料库·四格 · 与原表内容一致</footer>
+</main>
+
+
+
+
+<script src="board.js"></script>
+</body></html>

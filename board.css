@@ -1,0 +1,77 @@
+
+  :root{
+    --green-deep:#3D6B53;
+    --green:#6AA889;
+    --green-light:#8FC7AC;
+    --green-soft:#EDF5F0;
+    --green-head:#EAF3EE;
+    --bg:#F7F9F6;
+    --card:#FFFFFF;
+    --ink:#3A463F;
+    --muted:#93A098;
+    --line:#E9EFEA;
+    --radius:12px;
+    --shadow:0 2px 12px rgba(46,90,66,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6;
+    min-height:100vh;
+  }
+  .topbar{
+    background:linear-gradient(135deg,var(--green-light),var(--green));
+    color:#fff;padding:26px 24px 22px;text-align:center;
+  }
+  .topbar h1{font-size:20px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.08);}
+  .wrap{max-width:760px;margin:26px auto 60px;padding:0 20px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  .card-title{
+    padding:16px 20px;font-size:15.5px;font-weight:700;color:var(--green-deep);
+    border-bottom:1px solid var(--line);background:#FCFEFD;
+  }
+  .status{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 20px;font-size:12.5px;color:var(--muted);
+    border-bottom:1px solid var(--line);background:#FBFCFB;
+  }
+  .saved-tip{color:var(--green);opacity:0;transition:.3s;}
+  .saved-tip.on{opacity:1;}
+  .table-wrap{overflow-x:auto;}
+  table{border-collapse:collapse;width:100%;}
+  th,td{
+    border-bottom:1px solid var(--line);border-right:1px solid var(--line);
+    padding:14px 18px;text-align:left;font-size:14px;
+  }
+  th:last-child,td:last-child{border-right:0;}
+  thead th{background:var(--green-head);color:#35604A;font-weight:600;}
+  tbody tr:last-child td{border-bottom:0;}
+  tbody tr:hover{background:var(--green-soft);}
+  td.coord{
+    font-weight:600;color:var(--green-deep);width:180px;white-space:nowrap;
+    font-family:"SF Mono",Consolas,Menlo,monospace;letter-spacing:.5px;
+  }
+  td.cell{outline:none;min-height:24px;}
+  td.cell:focus{background:#fff;box-shadow:inset 0 0 0 2px var(--green-light);border-radius:6px;}
+  td.cell:empty::before{content:"点此填写";color:#C2CCC6;font-size:13px;}
+  .note{
+    padding:14px 20px;font-size:13px;color:var(--muted);
+    background:#FCFEFD;border-top:1px solid var(--line);
+  }
+  .ops{margin-top:14px;text-align:right;}
+  button{
+    font-family:inherit;font-size:13px;cursor:pointer;border-radius:999px;
+    border:1px solid #9CC9B1;background:#fff;color:var(--green-deep);
+    padding:6px 16px;transition:.15s;
+  }
+  button:hover{background:var(--green);color:#fff;border-color:var(--green);}
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:22px;}
+  @media print{
+    .topbar{background:#fff;color:var(--green-deep);border-bottom:2px solid var(--green);}
+    .ops,.saved-tip{display:none;}
+    body{background:#fff;}
+    .card{box-shadow:none;}
+  }

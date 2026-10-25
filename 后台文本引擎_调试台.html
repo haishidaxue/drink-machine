@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>饮料机 · 文本引擎调试台</title>
+<style>
+  :root{--pine:#3f6b52;--pine2:#2f5340;--gold:#b08d3e;--paper:#f6f2e9;--ink:#26302a;--ink3:#7a857d;--line:#e6e0d2;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--paper);color:var(--ink);padding:22px;line-height:1.6}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-size:22px;color:var(--pine2);letter-spacing:1px}
+  .sub{color:var(--ink3);font-size:13px;margin:4px 0 18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(60,70,50,.04)}
+  .lab{font-size:12px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  input[type=text]{flex:1;min-width:200px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;outline:none}
+  input[type=text]:focus{border-color:var(--pine)}
+  button{border:0;background:var(--pine);color:#fff;padding:11px 18px;border-radius:10px;font-size:15px;cursor:pointer}
+  button.ghost{background:#eee9dc;color:var(--pine2)}
+  button:disabled{opacity:.5}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chips span{font-size:12px;border:1px solid var(--line);background:#fbfaf6;border-radius:99px;padding:5px 12px;cursor:pointer;color:var(--ink3)}
+  .chips span:hover{border-color:var(--pine2);color:var(--pine2)}
+  .status{font-size:12px;margin-top:8px}
+  .ok{color:#2e7d4f}.bad{color:#c0392b}.muted{color:var(--ink3)}
+  .drink{display:none}
+  .drink.show{display:block}
+  .dname{font-size:26px;color:var(--pine2);font-weight:800;letter-spacing:1px}
+  .dprice{font-size:22px;color:var(--c,#b04636);font-weight:800}
+  .ddesc{margin:8px 0 14px;color:#3a443d}
+  .dlead{font-family:"STKaiti","KaiTi",serif;font-size:18px;color:var(--pine2);margin-bottom:10px;letter-spacing:1px}
+  .blk{margin:8px 0;padding:10px 12px;background:rgba(45,90,61,.05);border-radius:10px}
+  .blk .lab{margin-bottom:4px}
+  ol.layers{margin:6px 0 0;padding-left:20px;color:#3a443d;line-height:1.9}
+  ol.layers li::marker{color:var(--gold)}
+  .ing{margin-bottom:8px}
+  .ing .top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px}
+  .bar{height:9px;background:#efe9db;border-radius:6px;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pine),#6f9a7d);border-radius:6px}
+  .tags{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+  .tag{font-size:12px;background:#eef4ef;color:var(--pine2);border-radius:8px;padding:3px 10px}
+  pre{background:#1f2620;color:#cfe0d2;padding:14px;border-radius:10px;font-size:12px;overflow:auto;white-space:pre-wrap;word-break:break-all}
+  .chatb{background:#f3efe4;border-radius:12px;padding:12px 14px;color:#3a443d}
+  .note{font-size:12px;color:var(--ink3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>饮料机 · 后台文本引擎调试台</h1>
+  <div class="sub">直连你自己的 DeepSeek 后台服务（deepseek-chat 基础款）。机器只有 4 种原料：东方树叶 / 水溶C / 橙汁 / 牛奶。</div>
+
+  <div class="card">
+    <div class="lab">后台服务地址</div>
+    <div class="row">
+      <input type="text" id="base" placeholder="http://localhost:8787" style="max-width:340px">
+      <button class="ghost" id="health">检测连接</button>
+      <span class="status muted" id="hstatus">未检测</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="lab">顾客说的话（随便说，越口语越好）</div>
+    <div class="row">
+      <input type="text" id="txt" placeholder="比如：给我最贵的，不要奶 / 来杯清爽解腻的 / 加班困死了整杯提神的">
+      <button id="send">生成</button>
+    </div>
+    <div class="chips" id="chips">
+      <span>给我推荐最贵的饮料，不要奶</span>
+      <span>来杯清爽解腻的</span>
+      <span>加班到半夜困死了，整杯提神的热的</span>
+      <span>想要浓郁丝滑、奶香重一点的</span>
+      <span>最便宜的就行</span>
+      <span>你是不是傻子</span>
+    </div>
+    <div class="status muted" id="estatus"></div>
+  </div>
+
+  <div class="card drink" id="drink">
+    <div class="dlead" id="dlead"></div>
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="dname" id="dname"></div>
+        <div class="tags" id="dtags"></div>
+      </div>
+      <div class="dprice" id="dprice"></div>
+    </div>
+    <div class="blk" id="blkMeaning"><div class="lab">名字的引申义</div><div class="ddesc" id="dmeaning"></div></div>
+    <div class="blk" id="blkWhy"><div class="lab">为什么这样为你调配</div><div class="ddesc" id="dwhy"></div></div>
+    <div class="blk" id="blkLayers"><div class="lab">风味层次</div><ol class="layers" id="dlayers"></ol></div>
+    <div class="blk" id="blkBenefit"><div class="lab">好处与适合的此刻</div><div class="ddesc" id="dbenefit"></div></div>
+    <div class="lab">配方（仅 4 种原料 + 冰）</div>
+    <div id="recipe"></div>
+    <div class="note" id="meta" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div class="lab">每日推荐 · 天天不同角度（同一杯，换日期看文案差异）</div>
+    <div class="row">
+      <input type="text" id="dName" value="金橙轻享特调" style="max-width:200px">
+      <input type="date" id="dDate">
+      <button class="ghost" id="dailyBtn">生成今日推荐语</button>
+    </div>
+    <div class="ddesc" id="dailyOut" style="margin-top:10px"></div>
+    <div class="status muted" id="dailyStatus"></div>
+  </div>
+
+  <div class="card chatb" id="chatCard" style="display:none"></div>
+
+  <div class="card">
+    <div class="lab">后台原始返回 JSON</div>
+    <pre id="raw">（生成后显示）</pre>
+  </div>
+</div>
+<script>
+var $=function(id){return document.getElementById(id);};
+var KEY='drink_engine_base';
+$('base').value=localStorage.getItem(KEY)||'http://localhost:8787';
+$('base').onchange=function(){localStorage.setItem(KEY,$('base').value.trim());};
+function base(){return $('base').value.trim().replace(/\/+$/,'');}
+function setStatus(el,s,cls){el.className='status '+(cls||'muted');el.textContent=s;}
+
+$('health').onclick=function(){
+  setStatus($('hstatus'),'检测中…','muted');
+  fetch(base()+'/health').then(function(r){return r.json();}).then(function(j){
+    setStatus($('hstatus'),'已连接 · 模型 '+j.model+' · Key'+(j.keyConfigured?'已配置':'未配置')+' · 原料：'+j.ingredients.join('、'),'ok');
+  }).catch(function(){setStatus($('hstatus'),'连不上：请确认服务已启动、地址正确（且允许跨域）','bad');});
+};
+$('chips').addEventListener('click',function(e){if(e.target.tagName==='SPAN'){$('txt').value=e.target.textContent;gen();}});
+$('send').onclick=gen;
+$('txt').addEventListener('keydown',function(e){if(e.key==='Enter')gen();});
+
+function gen(){
+  var t=$('txt').value.trim();if(!t)return;
+  var btn=$('send');btn.disabled=true;setStatus($('estatus'),'DeepSeek 思考中…','muted');
+  $('drink').classList.remove('show');$('chatCard').style.display='none';
+  fetch(base()+'/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:t})})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      $('raw').textContent=JSON.stringify(j,null,2);
+      if(j.error){setStatus($('estatus'),j.error,'bad');return;}
+      if(j.order===false){
+        $('chatCard').style.display='block';
+        $('chatCard').textContent='（非点单）'+(j.reply||'');
+        setStatus($('estatus'),'判定为非点单，未生成饮品','muted');return;
+      }
+      render(j);
+      setStatus($('estatus'),(j.fallback?'当前是离线兜底配方（DeepSeek 未成功）':'DeepSeek 生成成功')+' · 引擎 '+(j.engine||''),j.fallback?'bad':'ok');
+    })
+    .catch(function(){setStatus($('estatus'),'请求失败：服务未启动或跨域被拦','bad');})
+    .finally(function(){btn.disabled=false;});
+}
+function render(j){
+  $('drink').classList.add('show');
+  $('dlead').textContent=j.lead||'';
+  $('dname').textContent=j.name||'现调一杯';
+  $('dprice').textContent='¥'+j.price;
+  $('dmeaning').textContent=j.meaning||'';
+  $('dwhy').textContent=j.why||'';
+  $('dbenefit').textContent=j.benefit||'';
+  $('dlayers').innerHTML=(j.layers||[]).map(function(x){return '<li>'+x+'</li>';}).join('');
+  var tags=[];
+  tags.push({cold:'冰饮',normal:'常温',hot:'热饮'}[j.temp]||'冰饮');
+  if(j.ice)tags.push(j.ice);
+  $('dtags').innerHTML=tags.map(function(x){return '<span class="tag">'+x+'</span>';}).join('');
+  var total=(j.recipe||[]).reduce(function(a,r){return a+(+r.ml||0);},0)||1;
+  $('recipe').innerHTML=(j.recipe||[]).map(function(r){
+    var pct=Math.round((+r.ml||0)/total*100);
+    return '<div class="ing"><div class="top"><span>'+r.name+'</span><span>'+r.ml+'ml</span></div>'+
+      '<div class="bar"><i style="width:'+pct+'%"></i></div></div>';
+  }).join('');
+  $('meta').textContent=(j.cost!=null?('成本约 ¥'+j.cost+'，毛利 ¥'+((j.price-j.cost).toFixed(1))):'');
+}
+(function(){
+  var d=new Date();$('dDate').value=d.toISOString().slice(0,10);
+  $('dailyBtn').onclick=function(){
+    var date=$('dDate').value||$('dDate').placeholder;
+    var idx=Math.floor(new Date(date+'T00:00:00').getTime()/86400000);
+    $('dailyStatus').textContent='DeepSeek 现写今日角度…';$('dailyOut').textContent='';
+    fetch(base()+'/api/daily',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name:$('dName').value||'今日特选',date:date,angleIdx:idx})})
+      .then(function(r){return r.json();}).then(function(j){
+        if(j.error){$('dailyStatus').textContent=j.error;return;}
+        $('dailyOut').textContent=j.text||'';
+        $('dailyStatus').textContent='今日角度：'+(j.angle||'');
+      }).catch(function(){$('dailyStatus').textContent='请求失败：服务未启动或跨域被拦';});
+  };
+})();
+</script>
+</body>
+</html>

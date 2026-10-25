@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "渴了吗 · AI饮料机",
+    "navigationBarBackgroundColor": "#14211a",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#eef2ee"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

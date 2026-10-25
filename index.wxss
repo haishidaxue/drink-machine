@@ -1,0 +1,26 @@
+/* pages/index/index.wxss */
+.wrap{padding:24rpx 28rpx calc(env(safe-area-inset-bottom) + 40rpx);}
+.hero{background:linear-gradient(150deg,#1b3a2c,#0f2a1e);border-radius:28rpx;padding:44rpx 36rpx;color:#fff;box-shadow:0 14rpx 40rpx rgba(20,50,35,.25);}
+.brand{font-size:26rpx;opacity:.85;}
+.title{font-size:46rpx;font-weight:800;margin:12rpx 0 8rpx;letter-spacing:1rpx;}
+.sub{font-size:24rpx;opacity:.75;}
+.sec-title{font-size:28rpx;font-weight:700;color:#2a3b31;margin:34rpx 6rpx 18rpx;}
+.drink-list{display:flex;flex-direction:column;gap:18rpx;}
+.dcard{background:#fff;border-radius:22rpx;padding:28rpx 30rpx;display:flex;flex-direction:column;gap:8rpx;border:2rpx solid transparent;box-shadow:0 6rpx 20rpx rgba(30,60,45,.06);position:relative;}
+.dcard.on{border-color:#1f7a55;}
+.dname{font-size:32rpx;font-weight:700;}
+.ddesc{font-size:24rpx;color:#7a8a80;}
+.dprice{position:absolute;right:30rpx;top:28rpx;color:#126042;font-weight:800;font-size:32rpx;}
+.seg{display:flex;gap:14rpx;}
+.seg-item{flex:1;text-align:center;background:#fff;border-radius:999rpx;padding:20rpx 0;font-size:26rpx;color:#46604f;border:2rpx solid #e6ece7;}
+.seg-item.on{background:#14211a;color:#fff;border-color:#14211a;}
+.total{text-align:right;font-size:26rpx;color:#5a6b60;margin:30rpx 6rpx 14rpx;}
+.total-n{color:#126042;font-size:40rpx;font-weight:800;margin-left:10rpx;}
+.paybtn{background:linear-gradient(120deg,#1f9b5f,#0f7a43);color:#fff;border-radius:999rpx;font-size:32rpx;font-weight:700;height:96rpx;line-height:96rpx;}
+.note{text-align:center;font-size:22rpx;color:#8a978e;margin-top:18rpx;line-height:1.6;}
+.done-mask{position:fixed;inset:0;background:rgba(15,30,22,.55);display:flex;align-items:center;justify-content:center;z-index:50;}
+.done-card{background:#fff;border-radius:28rpx;padding:56rpx 50rpx;width:78%;text-align:center;}
+.done-check{width:120rpx;height:120rpx;margin:0 auto 24rpx;border-radius:50%;background:linear-gradient(135deg,#22b070,#128a52);color:#fff;font-size:64rpx;line-height:120rpx;}
+.done-t{font-size:34rpx;font-weight:800;color:#17331f;}
+.done-c{font-size:26rpx;color:#6a7b70;margin:16rpx 0 34rpx;}
+.done-btn{background:#14211a;color:#fff;border-radius:999rpx;font-size:30rpx;}

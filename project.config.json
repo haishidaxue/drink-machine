@@ -1,0 +1,16 @@
+{
+  "description": "AI 现调茶饮机微信小程序",
+  "packOptions": { "ignore": [], "include": [] },
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.4.0",
+  "appid": "在此填入你注册的小程序 AppID",
+  "projectname": "keleme-drink-machine",
+  "condition": {}
+}

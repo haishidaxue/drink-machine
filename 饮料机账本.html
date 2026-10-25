@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>饮料机账本 · 我的微信收款对账</title>
+<style>
+  :root{
+    --paper:#f6f4ee;--card:#fffdf8;--ink:#26302a;--ink2:#566059;--ink3:#98a098;
+    --line:#e7e3d8;--pine:#3a5a40;--pine2:#4a7055;--pineSoft:#eef2ec;
+    --wx:#07c160;--wxSoft:#e8f8ef;--gold:#b89b5e;--red:#b4503a;--redSoft:#f8eeea;
+    --amber:#a9782f;--amberSoft:#fbf4e4;
+    --shadow:0 1px 2px rgba(38,48,42,.05),0 10px 30px -12px rgba(38,48,42,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;
+    padding:28px 18px 60px;
+  }
+  .wrap{max-width:1040px;margin:0 auto}
+
+  .top{display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+  .brand{display:flex;align-items:center;gap:13px}
+  .logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(150deg,var(--pine),var(--pine2));
+    color:#fff;display:grid;place-items:center;font-size:22px;box-shadow:var(--shadow)}
+  .brand h1{font-size:21px;letter-spacing:.5px;font-weight:700}
+  .brand .sub{font-size:12px;color:var(--ink3);margin-top:2px;letter-spacing:.3px}
+  .tools{display:flex;gap:8px;flex-wrap:wrap}
+  .tbtn{border:1px solid var(--line);background:var(--card);color:var(--ink2);border-radius:10px;
+    padding:8px 13px;font-size:12.5px;cursor:pointer;transition:.16s}
+  .tbtn:hover{border-color:var(--pine);color:var(--pine)}
+  .tbtn.wx{background:var(--wx);border-color:var(--wx);color:#fff;font-weight:600}
+  .tbtn.wx:hover{filter:brightness(.95);color:#fff}
+  .tbtn.danger:hover{border-color:var(--red);color:var(--red)}
+
+  .ownerbar{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:12px 16px;margin-bottom:18px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .ownerbar .av{width:40px;height:40px;border-radius:50%;background:var(--wxSoft);display:grid;place-items:center;font-size:20px}
+  .ownerbar .who b{font-size:14px}
+  .ownerbar .who .wxid{font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+  .ownerbar .tag{margin-left:auto;font-size:11px;background:var(--wxSoft);color:var(--wx);border-radius:20px;padding:4px 11px;font-weight:600}
+
+  .notice{background:var(--pineSoft);border:1px solid #dde6dc;color:var(--pine2);border-radius:12px;
+    padding:11px 15px;font-size:12.5px;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start}
+  .notice b{color:var(--pine)}
+  .notice.warn{background:var(--amberSoft);border-color:#ece0c2;color:var(--amber)}
+  .notice.warn b{color:var(--amber)}
+  .notice .x{margin-left:auto;cursor:pointer;color:var(--ink3);font-size:16px;line-height:1;padding:0 2px}
+
+  /* 待对账面板 */
+  .recon{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
+    overflow:hidden;margin-bottom:22px}
+  .recon-head{display:flex;align-items:center;gap:10px;padding:15px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .recon-head h2{font-size:15px;font-weight:700}
+  .recon-head .cnt{font-size:12px;color:var(--red);font-weight:600;background:var(--redSoft);border-radius:20px;padding:2px 10px}
+  .recon-head .sp{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .mini-btn{border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:9px;padding:7px 12px;font-size:12px;cursor:pointer}
+  .mini-btn:hover{border-color:var(--pine);color:var(--pine)}
+  .mini-btn.wx{background:var(--wx);border-color:var(--wx);color:#fff;font-weight:600}
+  .mini-btn.warn{color:var(--amber);border-color:#e6d6b0}
+  .mini-btn.cloud{background:#14211a;border-color:#14211a;color:#fff}
+  .cloudbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px 20px;background:#f3f6f3;border-bottom:1px solid var(--line)}
+  .cloudbar input{border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:12.5px;background:#fff}
+  .cloudbar .recon-tip{background:transparent;border:0;padding:0}
+  .recon-tip{padding:11px 20px;font-size:12px;color:var(--ink3);background:#faf8f2;border-bottom:1px solid var(--line)}
+  .recon-tip b{color:var(--ink2)}
+  .recon-result{display:none;padding:11px 20px;font-size:12.5px;border-bottom:1px solid var(--line)}
+  .recon-result.show{display:block}
+  .recon-result.ok{background:var(--wxSoft);color:#177a43}
+  .recon-result.miss{background:var(--amberSoft);color:var(--amber)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{text-align:left;font-size:11.5px;color:var(--ink3);font-weight:600;padding:11px 14px;background:#faf8f2;
+    border-bottom:1px solid var(--line);white-space:nowrap}
+  tbody td{padding:12px 14px;border-bottom:1px solid #f0ede4;vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  .codechip{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;letter-spacing:2px;
+    background:#f3f0e7;border:1px solid var(--line);border-radius:7px;padding:2px 8px;font-size:12.5px}
+  .btn-confirm{background:var(--wx);color:#fff;border:none;border-radius:9px;padding:7px 13px;font-size:12px;cursor:pointer;font-weight:600}
+  .btn-confirm:hover{filter:brightness(.95)}
+  .muted{color:var(--ink3);font-size:11.5px}
+
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:22px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 14px;box-shadow:var(--shadow)}
+  .kpi .k{font-size:11.5px;color:var(--ink3);display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .kpi .v{font-size:22px;font-weight:700;margin-top:8px;letter-spacing:.2px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .kpi .v small{font-size:12px;font-weight:600;color:var(--ink3);margin-left:1px}
+  .kpi .d{font-size:10.5px;color:var(--ink3);margin-top:4px;white-space:nowrap}
+  .kpi.income .v{color:var(--pine)}
+  .kpi.refund .v{color:#c07a52}
+  .kpi.cost .v{color:var(--ink2)}
+  .kpi.profit{background:linear-gradient(150deg,#3a5a40,#4a7055);border-color:transparent}
+  .kpi.profit .k,.kpi.profit .v,.kpi.profit .d{color:#fff}
+  .kpi.profit .k{opacity:.85}.kpi.profit .d{opacity:.78}
+  .kpi.margin .v{color:var(--gold)}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:10px}
+  .panel-head h2{font-size:15px;font-weight:700}
+  .panel-head .cnt{font-size:12px;color:var(--ink3);margin-left:8px;font-weight:400}
+  .tabs{display:flex;gap:6px}
+  .tab{border:1px solid var(--line);background:#fff;color:var(--ink2);border-radius:9px;padding:6px 12px;font-size:12px;cursor:pointer}
+  .tab.on{background:var(--pine);border-color:var(--pine);color:#fff}
+
+  tbody tr.refund-row{background:#fcf7f5}
+  .itemcell{display:flex;align-items:center;gap:10px;min-width:200px}
+  .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:16px;flex:none}
+  .ic.in{background:var(--pineSoft)}.ic.out{background:var(--redSoft)}
+  .itemcell .nm{font-weight:600}
+  .itemcell .mt{font-size:11px;color:var(--ink3);font-weight:400}
+  .from{font-size:12px;color:var(--ink2)}
+  .from .who{font-weight:600;color:var(--ink)}
+  .time{font-size:12px;color:var(--ink2);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .num{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .num.in{color:var(--pine)}.num.out{color:#c0563f}
+  .costv{color:var(--ink2);font-variant-numeric:tabular-nums}
+  .profitv{font-variant-numeric:tabular-nums;color:var(--pine2);font-weight:600}
+  .badge{font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+  .badge.refunded{background:var(--redSoft);color:var(--red)}
+  .badge.sys{background:#eef1f3;color:#6b7280;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600}
+  .badge.match{background:var(--wxSoft);color:var(--wx)}
+  .empty{padding:46px 20px;text-align:center;color:var(--ink3);font-size:13px}
+
+  .foot{margin-top:20px;font-size:11.5px;color:var(--ink3);line-height:1.8}
+  .foot b{color:var(--ink2)}
+  input[type=file]{display:none}
+  code{background:#eee9dd;border-radius:4px;padding:1px 5px;font-size:11px}
+
+  @media(max-width:860px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .kpi.profit{grid-column:1/-1}
+    table,thead,tbody,th,td,tr{display:block}
+    thead{display:none}
+    tbody td{border:none;padding:6px 16px}
+    tbody tr{padding:12px 0;border-bottom:1px solid #f0ede4}
+    .time{padding-top:2px}
+    .num,.costv,.profitv{display:inline-block;margin-right:16px}
+    .ownerbar .tag{margin-left:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="logo">🧾</div>
+      <div>
+        <h1>我的饮料机收款账本</h1>
+        <div class="sub">店主第一视角 · 只核对「饮料机这台设备」顾客付给我微信的钱</div>
+      </div>
+    </div>
+    <div class="tools">
+      <button class="tbtn" id="btnQr">上传我的收款码</button>
+      <input type="file" id="fileQr" accept="image/*">
+      <button class="tbtn" id="btnExport">导出账本(JSON)</button>
+      <button class="tbtn" id="btnImport">导入账本</button>
+      <input type="file" id="fileImport" accept="application/json,.json">
+      <button class="tbtn danger" id="btnClear">清空全部</button>
+    </div>
+  </div>
+
+  <div class="ownerbar">
+    <div class="av">💚</div>
+    <div class="who">
+      <b>收款微信号（店主本人）</b>
+      <div class="wxid" id="ownerWxid">wxid_au…22</div>
+    </div>
+    <div class="tag">顾客付款 → 直接进我微信</div>
+  </div>
+
+  <div class="notice">
+    <span>🔗</span>
+    <div><b>怎么记账：</b>顾客在饮料机扫码后，是扫<b>我本人的微信收款码</b>转账给我，并按提示填写 <b>6 位订单码</b>。
+      我在微信「服务 → 钱包 → 账单 → 申请交易账单」导出 CSV，在这里<b>一键导入</b>，系统自动把带订单码 / 金额时间对得上的饮料机收款挑出来核对入账；
+      我微信里的红包、朋友转账、其他生意收款等<b>一律忽略，不会记进这本账</b>。</div>
+    <span class="x" id="closeHow">×</span>
+  </div>
+
+  <!-- 待对账 -->
+  <div class="recon" id="reconPanel" style="display:none">
+    <div class="recon-head">
+      <h2>⏳ 待我核对的饮料机订单</h2>
+      <span class="cnt" id="pendingCnt">0 笔</span>
+      <div class="sp">
+        <button class="mini-btn warn" id="btnDemo">试用演示账单</button>
+        <button class="mini-btn wx" id="btnCsv">导入微信账单(CSV)自动对账</button>
+        <button class="mini-btn cloud" id="btnCloud">从支付服务器同步(上线后)</button>
+        <input type="file" id="fileCsv" accept=".csv,text/csv">
+      </div>
+    </div>
+    <div class="cloudbar" id="cloudBar" style="display:none">
+      服务器 <input id="srvBase" placeholder="https://你的域名" style="min-width:200px">
+      商家口令 <input id="srvKey" type="password" placeholder="OWNER_KEY" style="min-width:140px">
+      <button class="mini-btn wx" id="btnDoSync">开始同步</button>
+      <span class="recon-tip" id="cloudMsg" style="margin:0"></span>
+    </div>
+    <div class="recon-tip">导入后自动匹配：<b>① 转账备注含 6 位订单码</b>　② 金额一致且时间相差 45 分钟内。匹配上才计入收入，匹配不上的其他进账自动忽略。现场也可逐笔点「确认已到账」。</div>
+    <div class="recon-result" id="reconResult"></div>
+    <div id="pendingWrap"></div>
+  </div>
+
+  <div class="notice warn" id="emptyHint" style="display:none">
+    <span>📭</span>
+    <div>还没有饮料机订单。顾客用小程序下单并扫你的收款码后，未核对的订单会出现在这里；也可以先点「<b>试用演示账单</b>」看自动对账效果。</div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>已入账流水<span class="cnt" id="listCnt"></span></h2>
+      <div class="tabs">
+        <button class="tab on" data-f="all">全部</button>
+        <button class="tab" data-f="income">收入</button>
+        <button class="tab" data-f="refund">退款</button>
+      </div>
+    </div>
+    <div id="tableWrap"></div>
+  </div>
+
+  <div class="foot">
+    <b>记账口径：</b>只有核对到账的饮料机订单才计入收入；净利润 ＝ 累计收入 − 原料成本 − 退款支出；净现金流 ＝ 累计收入 − 退款支出；客单价 ＝ 累计收入 ÷ 成交单数。<br>
+    <b>自动对账：</b>导入的是微信官方导出的本人账单 CSV，全程只在本机浏览器内解析，不上传任何服务器；系统按订单码 / 金额时间窗精确匹配本店订单，其余微信收支一律忽略。<br>
+    <b>无人值守想要全自动：</b>个人收款码微信不提供到账回调，只能这样对账；若以后要顾客付完机器立刻自动出餐，用个人身份证办「小微商户」（免营业执照）即可走官方微信支付回调，配套的 <code>真实支付后端_server.js</code> 已就绪。<br>
+    <b>* 估算：</b>缺失成本字段的旧记录按售价 40% 估算原料成本；新订单均按实际配方分项核算。
+  </div>
+</div>
+
+<script>
+/* ================= 常量与存储 ================= */
+var OWNER_WXID="wxid_auf9zvuxskml22";
+var LEDKEY="drink_machine_ledger_v1";   // 已入账收入/退款（与小程序共用）
+var ORDKEY="drink_machine_orders_v1";   // 小程序产生的订单（含待核对）
+var QRKEY="drink_machine_owner_qr";     // 店主个人收款码图片 dataURL
+function maskWxid(s){if(!s)return"";return s.length>10?s.slice(0,8)+"…"+s.slice(-2):s;}
+document.getElementById("ownerWxid").textContent=maskWxid(OWNER_WXID);
+
+function load(k){try{return JSON.parse(localStorage.getItem(k)||"[]");}catch(e){return [];}}
+function save(k,a){try{localStorage.setItem(k,JSON.stringify(a));}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function r2(n){return Math.round(n*100)/100;}
+function esc(s){return (s==null?"":String(s)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function fmtTime(ts){var d=new Date(ts),p=function(n){return n<10?"0"+n:n;};
+  return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes());}
+
+/* ================= 订单与入账 ================= */
+function pendingOrders(){return load(ORDKEY).filter(function(o){return o.status!=="paid";});}
+function isOrderBooked(orderId){return load(LEDKEY).some(function(r){return r.kind==="income"&&r.orderId===orderId;});}
+function bookIncome(o,from,method,txn){
+  var led=load(LEDKEY);
+  if(led.some(function(r){return r.kind==="income"&&r.orderId===o.orderId;}))return false;
+  led.push({id:uid(),orderId:o.orderId,kind:"income",amount:o.amount,cost:o.cost,
+    item:o.item,method:method||"微信收款码·自动核对",from:from||"微信顾客",
+    txn:txn||"",ts:o.paidTs||Date.now()});
+  save(LEDKEY,led);
+  var ords=load(ORDKEY).map(function(x){if(x.orderId===o.orderId){x.status="paid";x.paidTs=o.paidTs||Date.now();x.paidBy=from;}return x;});
+  save(ORDKEY,ords);
+  return true;
+}
+
+/* ================= 微信账单 CSV 解析 =================
+   微信个人账单 CSV 结构（导出后为带表头说明的逗号分隔，可能含 GBK/UTF-8）：
+   交易时间,交易类型,交易对方,商品,收/支,金额(元),支付方式,当前状态,交易单号,商户单号,备注 */
+function parseCsvLine(line){
+  var out=[],cur="",q=false;
+  for(var i=0;i<line.length;i++){var c=line[i];
+    if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++;}else q=!q;}
+    else if(c===","&&!q){out.push(cur);cur="";}
+    else cur+=c;}
+  out.push(cur);return out.map(function(s){return s.trim();});
+}
+function parseWxBill(text){
+  /* 去 BOM，微信账单每行结尾常有制表符/逗号，统一清掉空尾列 */
+  text=text.replace(/^﻿/,"");
+  var lines=text.split(/\r?\n/);
+  var hi=-1,header=null;
+  for(var i=0;i<lines.length;i++){
+    var c=parseCsvLine(lines[i]);
+    if(c[0]&&c[0].indexOf("交易时间")===0){hi=i;header=c;break;}
+  }
+  if(hi<0)throw new Error("没找到「交易时间」表头，请确认是微信官方导出的账单 CSV。");
+  var idx={};
+  header.forEach(function(h,j){
+    if(h.indexOf("交易时间")===0)idx.time=j;
+    else if(h.indexOf("交易对方")===0)idx.party=j;
+    else if(h.indexOf("商品")===0)idx.goods=j;
+    else if(h.indexOf("收/支")===0||h==="收支")idx.dir=j;
+    else if(h.indexOf("金额")===0)idx.amount=j;
+    else if(h.indexOf("当前状态")===0)idx.status=j;
+    else if(h.indexOf("交易单号")===0)idx.txn=j;
+    else if(h.indexOf("备注")===0)idx.note=j;
+  });
+  var rows=[];
+  for(var k=hi+1;k<lines.length;k++){
+    if(!lines[k].trim())continue;
+    var f=parseCsvLine(lines[k]);if(f.length<4)continue;
+    var dir=(f[idx.dir]||"").replace(/\s/g,"");
+    var amt=parseFloat((f[idx.amount]||"").replace(/[¥￥,\s]/g,""));
+    var st=f[idx.status]||"";
+    if(dir!=="收入"||!(amt>0))continue;                     // 只看“我收到的钱”
+    if(st&&/(关闭|退款|失败|已退)/.test(st))continue;       // 非正常到账不计
+    var t=parseWxTime(f[idx.time]);
+    rows.push({time:t,party:f[idx.party]||"微信顾客",goods:f[idx.goods]||"",
+      amount:r2(amt),status:st,txn:f[idx.txn]||"",note:f[idx.note]||""});
+  }
+  return rows;
+}
+function parseWxTime(s){
+  if(!s)return Date.now();
+  var m=s.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})[^\d]*(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?/);
+  if(m)return new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0)).getTime();
+  return Date.now();
+}
+
+/* ================= 核心：只匹配饮料机订单，其余收入忽略 ================= */
+function reconcile(rows){
+  var pend=pendingOrders(),matched=0,usedRow={};
+  rows.forEach(function(row,ri){
+    var o=null;
+    /* ① 备注里带 6 位订单码（最强匹配） */
+    var codeInNote=(row.note||"").match(/\d{6}/);
+    if(codeInNote){
+      o=pend.find(function(x){return x.status!=="paid"&&x.code===codeInNote[0]&&!usedRow[ri];});
+    }
+    /* ② 金额一致 + 45 分钟时间窗内唯一候选 */
+    if(!o){
+      var cands=pend.filter(function(x){
+        return x.status!=="paid"&&Math.abs(x.amount-row.amount)<0.005&&
+          Math.abs(x.ts-row.time)<=45*60*1000;
+      });
+      if(cands.length===1&&!usedRow[ri])o=cands[0];
+    }
+    if(o){
+      usedRow[ri]=true;
+      o.paidTs=row.time;
+      bookIncome(o,row.party,"微信收款码·账单核对",row.txn);
+      matched++;
+    }
+    /* 匹配不上：朋友转账/红包/其他生意收款 → 明确忽略，不入账 */
+  });
+  return {matched:matched,ignored:rows.length-matched,total:rows.length};
+}
+
+/* ================= 统计（只算已入账） ================= */
+function effCost(r){
+  if(r.kind==="refund")return {v:0,est:false};
+  var c=Number(r.cost);
+  if(isFinite(c)&&c>0)return {v:r2(c),est:false};
+  return {v:r2(Number(r.amount||0)*0.4),est:true};
+}
+function totals(list){
+  var t={income:0,refund:0,cost:0,costEst:0,incN:0,refN:0};
+  list.forEach(function(r){
+    if(r.kind==="refund"){t.refund=r2(t.refund+r.amount);t.refN++;}
+    else{t.income=r2(t.income+r.amount);t.incN++;
+      var ec=effCost(r);t.cost=r2(t.cost+ec.v);if(ec.est)t.costEst=r2(t.costEst+ec.v);}
+  });
+  t.profit=r2(t.income-t.cost-t.refund);
+  t.net=r2(t.income-t.refund);
+  t.margin=t.income>0?Math.round(t.profit/t.income*1000)/10:0;
+  return t;
+}
+
+/* ================= 渲染 ================= */
+var filter="all";
+function renderPending(){
+  var pend=pendingOrders(),panel=document.getElementById("reconPanel");
+  document.getElementById("pendingCnt").textContent=pend.length+" 笔";
+  panel.style.display=pend.length?"block":"none";
+  document.getElementById("emptyHint").style.display=pend.length?"none":"flex";
+  if(!pend.length){document.getElementById("pendingWrap").innerHTML="";return;}
+  var sorted=pend.slice().sort(function(a,b){return a.ts-b.ts;});
+  var rows=sorted.map(function(o){
+    return '<tr><td><div class="itemcell"><div class="ic in">🥤</div>'+
+      '<div><div class="nm">'+esc(o.item)+'</div><div class="mt">订单码 <span class="codechip">'+esc(o.code)+'</span></div></div></div></td>'+
+      '<td class="time">'+fmtTime(o.ts)+'</td>'+
+      '<td class="num in">¥'+r2(o.amount).toFixed(2)+'</td>'+
+      '<td><button class="btn-confirm" data-confirm="'+esc(o.orderId)+'">确认已到账</button></td></tr>';
+  }).join("");
+  document.getElementById("pendingWrap").innerHTML=
+    '<table><thead><tr><th>商品 / 订单码</th><th>下单时间</th><th>应收</th><th>手动核对</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  document.querySelectorAll("[data-confirm]").forEach(function(b){
+    b.onclick=function(){
+      var oid=b.getAttribute("data-confirm");
+      var o=load(ORDKEY).find(function(x){return x.orderId===oid;});
+      if(o&&bookIncome(o,"现场核对（微信收款码）","微信收款码·现场核对")){render();}
+    };
+  });
+}
+function renderKPIs(){
+  var t=totals(load(LEDKEY));
+  var aov=t.incN?r2(t.income/t.incN):0;
+  var refundRate=t.income>0?Math.round(t.refund/t.income*1000)/10:0;
+  var cards=[
+    {cls:"income",k:"💰 已核对收入",v:"¥"+t.income,d:t.incN+" 单 · 客单 ¥"+aov},
+    {cls:"refund",k:"↩️ 退款支出",v:"¥"+t.refund,d:t.refN+" 笔 · 退款率 "+refundRate+"%"},
+    {cls:"cost",k:"🧾 原料成本",v:"¥"+t.cost,d:(t.costEst>0?"含 ¥"+t.costEst+" 早期估算*":"按市场价分项核算")},
+    {cls:"profit",k:"📈 净利润",v:"¥"+t.profit,d:"收入 − 成本 − 退款"},
+    {cls:"margin",k:"🏦 净现金流",v:"¥"+t.net,d:"收入 − 退款"},
+    {cls:"cost",k:"📊 净利率",v:t.margin+"%",d:"净利润 ÷ 收入"}
+  ];
+  document.getElementById("kpis").innerHTML=cards.map(function(c){
+    return '<div class="kpi '+c.cls+'"><div class="k">'+c.k+'</div><div class="v">'+c.v+'</div><div class="d">'+c.d+'</div></div>';
+  }).join("");
+}
+function renderTable(){
+  var all=load(LEDKEY);
+  var list=all.filter(function(r){
+    if(filter==="income")return r.kind!=="refund";
+    if(filter==="refund")return r.kind==="refund";
+    return true;
+  }).slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  document.getElementById("listCnt").textContent="共 "+list.length+" 条";
+  if(!list.length){
+    document.getElementById("tableWrap").innerHTML='<div class="empty">还没有已入账流水，先在上方核对顾客付款</div>';
+    return;
+  }
+  var rows=list.map(function(r){
+    var isIn=r.kind!=="refund";var who=esc(r.from)||"微信顾客";
+    if(isIn){
+      var ec=effCost(r);
+      var status='<span class="costv"'+(ec.est?' title="缺少成本，按售价40%估算"':'')+'>成本 ¥'+ec.v+(ec.est?'<sup>*</sup>':'')+'</span> '+
+        '<span class="profitv">毛利 ¥'+r2(r.amount-ec.v)+'</span>';
+      var how=/自动|账单/.test(r.method||"")?'<span class="badge match">账单自动核对</span>':'<span class="badge sys">现场核对</span>';
+      return '<tr><td><div class="itemcell"><div class="ic in">💚</div>'+
+        '<div><div class="nm">'+esc(r.item)+'</div><div class="mt">'+esc(r.method||"微信收款码")+'</div></div></div></td>'+
+        '<td class="from">来自 <span class="who">'+who+'</span></td>'+
+        '<td class="time">'+fmtTime(r.ts)+'</td>'+
+        '<td class="num in">+¥'+r2(r.amount).toFixed(2)+'</td>'+
+        '<td>'+status+' '+how+'</td></tr>';
+    }
+    return '<tr class="refund-row"><td><div class="itemcell"><div class="ic out">↩️</div>'+
+      '<div><div class="nm">'+esc(r.item)+'</div><div class="mt">'+esc(r.method||"微信转账退回")+'</div></div></div></td>'+
+      '<td class="from">退给 <span class="who">'+who+'</span></td>'+
+      '<td class="time">'+fmtTime(r.ts)+'</td>'+
+      '<td class="num out">-¥'+r2(r.amount).toFixed(2)+'</td>'+
+      '<td><span class="badge refunded">退款支出</span> <span class="badge sys">店主记账</span></td></tr>';
+  }).join("");
+  document.getElementById("tableWrap").innerHTML=
+    '<table><thead><tr><th>订单 / 方式</th><th>来自谁</th><th>几时几分</th><th>金额</th><th>成本 / 毛利 · 核对方式</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+function render(){renderPending();renderKPIs();renderTable();}
+function showResult(ok,html){
+  var el=document.getElementById("reconResult");
+  el.className="recon-result show "+(ok?"ok":"miss");el.innerHTML=html;
+}
+
+/* ================= 交互 ================= */
+document.querySelectorAll(".tab").forEach(function(t){
+  t.onclick=function(){document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");});
+    t.classList.add("on");filter=t.getAttribute("data-f");renderTable();};
+});
+document.getElementById("closeHow").onclick=function(){this.parentNode.style.display="none";};
+
+/* 上线后：从支付服务器同步已到账流水（微信支付官方回调确认，无需导账单） */
+document.getElementById("btnCloud").onclick=function(){
+  var bar=document.getElementById("cloudBar");
+  bar.style.display=bar.style.display==="none"?"flex":"none";
+};
+document.getElementById("srvBase").value=localStorage.getItem("dm_srv_base")||"";
+document.getElementById("srvKey").value=localStorage.getItem("dm_srv_key")||"";
+document.getElementById("btnDoSync").onclick=function(){
+  var base=document.getElementById("srvBase").value.trim().replace(/\/+$/,"");
+  var key=document.getElementById("srvKey").value.trim();
+  var msg=document.getElementById("cloudMsg");
+  if(!base||!key){msg.textContent="请填服务器地址和商家口令";msg.style.color="#c0392b";return;}
+  localStorage.setItem("dm_srv_base",base);localStorage.setItem("dm_srv_key",key);
+  msg.textContent="同步中…";msg.style.color="#6a7b70";
+  var last=0;
+  load(LEDKEY).forEach(function(r){if(r.kind==="income"&&r.serverTs>last)last=r.serverTs;});
+  fetch(base+"/api/owner/orders?key="+encodeURIComponent(key)+"&since="+last)
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(!d||!d.orders){msg.textContent=d&&d.error?("失败："+d.error):"同步失败";msg.style.color="#c0392b";return;}
+      var led=load(LEDKEY),seen={},added=0;
+      led.forEach(function(r){if(r.txn)seen[r.txn]=1;});
+      d.orders.forEach(function(o){
+        if(seen[o.txn])return;
+        led.push({id:"sv"+Date.now()+"_"+Math.random().toString(36).slice(2,5),kind:"income",
+          amount:o.amount,cost:o.cost||Math.round(o.amount*0.4*100)/100,item:o.item,
+          method:o.method,from:o.from,txn:o.txn,ts:o.ts,serverTs:o.ts});
+        added++;
+      });
+      save(LEDKEY,led);render();
+      msg.textContent="同步完成，新增 "+added+" 笔已到账收入";msg.style.color="#177a43";
+    })
+    .catch(function(){msg.textContent="连不上服务器，检查地址/HTTPS/域名白名单";msg.style.color="#c0392b";});
+};
+
+/* 导入微信账单 CSV */
+document.getElementById("btnCsv").onclick=function(){document.getElementById("fileCsv").click();};
+document.getElementById("fileCsv").onchange=function(e){
+  var f=e.target.files[0];if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    try{
+      var rows=parseWxBill(reader.result);
+      if(!rows.length)throw new Error("账单里没有解析到「收入」记录。");
+      var r=reconcile(rows);
+      render();
+      if(r.matched>0)showResult(true,"✅ 自动核对 <b>"+r.matched+"</b> 笔饮料机收款并入账；其余 <b>"+r.ignored+"</b> 笔微信收入（红包/转账/其他生意）与饮料机无关，已自动忽略。");
+      else showResult(false,"⚠️ 导入的 "+r.total+" 笔收入里，没有能和当前待核对订单匹配上的（订单码 / 金额时间均不符），未记任何账。");
+    }catch(err){alert(err.message||"账单解析失败");}
+  };
+  reader.readAsText(f,"utf-8");e.target.value="";
+};
+
+/* 上传店主收款码（dataURL 存本地，供小程序读取展示） */
+document.getElementById("btnQr").onclick=function(){document.getElementById("fileQr").click();};
+document.getElementById("fileQr").onchange=function(e){
+  var f=e.target.files[0];if(!f)return;
+  var rd=new FileReader();
+  rd.onload=function(){try{localStorage.setItem(QRKEY,rd.result);alert("收款码已保存，饮料机小程序支付页会展示这张码。");}catch(x){alert("图片太大，请换一张更清晰但体积更小的收款码截图。");}};
+  rd.readAsDataURL(f);e.target.value="";
+};
+
+/* 演示：造 3 笔待核对订单 + 一份含干扰项的微信账单，跑真实匹配逻辑 */
+document.getElementById("btnDemo").onclick=function(){
+  var now=Date.now(),m=60*1000;
+  function mk(item,amount,cost,ago,code){
+    return {orderId:"YL"+now+"_"+code,code:code,amount:amount,cost:cost,item:item,
+      ts:now-ago,status:"pending"};
+  }
+  var demoOrders=[
+    mk("橙香醒力饮（正常奶·正常糖）",17,6.9,4*m,"482017"),
+    mk("云栖松烟（燕麦奶·少糖·多椰果）",19,7.7,18*m,"735602"),
+    mk("金橙轻享特调（AI 配比）",18,7.1,33*m,"259844")
+  ];
+  var ords=load(ORDKEY).filter(function(o){return o.status!=="paid";}).concat(demoOrders);
+  save(ORDKEY,ords);
+  function tline(ago,party,goods,dir,amt,status,note,txn){
+    var d=new Date(now-ago),p=function(n){return n<10?"0"+n:n;};
+    var ts=d.getFullYear()+"-"+p(d.getMonth()+1)-p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())+":"+p(d.getSeconds());
+    return [ts,"微信转账",party,goods,dir,"¥"+amt.toFixed(2),"零钱",status,txn,"","备注："+note].join(",");
+  }
+  var csv=[
+    "微信支付账单明细",
+    "交易时间,交易类型,交易对方,商品,收/支,金额(元),支付方式,当前状态,交易单号,商户单号,备注",
+    tline(3*m,"微信顾客*阿橙","转账","收入",17,"已收钱","482017","4200demo0001"),
+    tline(16*m,"奶茶搭子小林","转账","支出",25,"支付成功","昨天的奶茶钱","4200demo0002"),  // 支出：忽略
+    tline(17*m,"微信顾客*阿松","转账","收入",19,"已收钱","735602 饮料钱","4200demo0003"),
+    tline(25*m,"老妈","微信红包","收入",200,"已收钱","生日快乐","4200demo0004"),          // 红包：无订单码、金额不符→忽略
+    tline(34*m,"微信顾客*阿享","转账","收入",18,"已收钱","","4200demo0005")                // 无备注，靠金额+时间窗匹配
+  ].join("\n");
+  var rows=parseWxBill(csv),r=reconcile(rows);
+  render();
+  showResult(true,"🧪 演示：账单共 "+r.total+" 笔收入，自动核对 <b>"+r.matched+"</b> 笔饮料机订单并入账；忽略 <b>"+r.ignored+"</b> 笔无关收款（红包等），另有 1 笔支出已直接排除。点「清空全部」可清除演示数据。");
+};
+
+/* 导出 / 导入 / 清空（账本 JSON，含订单） */
+document.getElementById("btnExport").onclick=function(){
+  var data=JSON.stringify({ledger:load(LEDKEY),orders:load(ORDKEY),exportedAt:Date.now()},null,2);
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));
+  a.download="饮料机收款账本_"+new Date().toISOString().slice(0,10)+".json";a.click();
+  URL.revokeObjectURL(a.href);
+};
+document.getElementById("btnImport").onclick=function(){document.getElementById("fileImport").click();};
+document.getElementById("fileImport").onchange=function(e){
+  var f=e.target.files[0];if(!f)return;var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var d=JSON.parse(rd.result);
+      var led=Array.isArray(d)?d:d.ledger,ords=Array.isArray(d)?[]:(d.orders||[]);
+      if(!Array.isArray(led))throw 0;
+      if(confirm("导入将覆盖当前账本（收入 "+led.length+" 条、订单 "+ords.length+" 笔），确定？")){
+        save(LEDKEY,led);if(ords.length)save(ORDKEY,ords);render();alert("导入成功。");
+      }
+    }catch(x){alert("文件格式不正确，请选择由本账本导出的 JSON。");}
+  };
+  rd.readAsText(f);e.target.value="";
+};
+document.getElementById("btnClear").onclick=function(){
+  if(confirm("确定清空？将删除已入账流水和待核对订单（不影响收款码图片）。")){
+    if(confirm("再次确认：删除后不可恢复。")){save(LEDKEY,[]);save(ORDKEY,[]);
+      document.getElementById("reconResult").className="recon-result";render();}
+  }
+};
+
+/* 跨标签页：小程序/账单写入后即时刷新 */
+window.addEventListener("storage",function(e){
+  if(e.key===LEDKEY||e.key===ORDKEY)render();
+});
+
+render();
+</script>
+</body>
+</html>

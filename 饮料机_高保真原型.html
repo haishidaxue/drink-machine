@@ -1,0 +1,1950 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>饮料机 · 高保真小程序原型</title>
+<style>
+  :root{
+    --paper:#f5f2ea; --ivory:#fbf9f4;
+    --ink:#282a26; --ink2:#60635a; --ink3:#9fa197;
+    --pine:#43584a; --pine2:#5f7a66; --pineSoft:#e7ece4;
+    --gold:#b89b64; --goldSoft:#e7ddc7; --line:#e4e0d4;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    font-family:"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+    background:
+      radial-gradient(820px 620px at 8% -12%,#e8e5db 0,transparent 60%),
+      radial-gradient(820px 720px at 112% 112%,#d9d6cb 0,transparent 60%),
+      #d8d5ca;
+    color:var(--ink);display:flex;align-items:center;justify-content:center;
+    gap:56px;padding:28px;min-height:100vh;
+  }
+
+  .brief{max-width:246px;align-self:center}
+  .brief h2{font-size:28px;margin:0 0 10px;color:var(--pine);font-weight:700;letter-spacing:3px;
+    font-family:"Songti SC",serif}
+  .brief p{font-size:13px;line-height:2;color:#686a62;margin:0 0 14px}
+  .brief .tag{display:inline-block;border:1px solid #c4c2b8;background:rgba(255,255,255,.6);
+    color:var(--pine);border-radius:99px;padding:4px 13px;font-size:11.5px;margin:0 6px 8px 0}
+  @media(max-width:860px){.brief{display:none}}
+
+  /* 手机外壳 */
+  .phone{width:390px;height:820px;flex:0 0 auto;border-radius:56px;padding:11px;
+    background:linear-gradient(150deg,#4b4e48,#2a2d29);
+    box-shadow:0 48px 96px -34px rgba(40,46,40,.55),inset 0 0 0 2px rgba(255,255,255,.14)}
+  .screen{position:relative;width:100%;height:100%;border-radius:44px;overflow:hidden;background:var(--paper)}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:138px;height:24px;
+    background:#d9d6cc;border-radius:0 0 14px 14px;z-index:60}
+
+  .statusbar{height:44px;display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;font-size:13.5px;font-weight:600;color:var(--ink);position:relative;z-index:5}
+  .navbar{height:50px;display:flex;align-items:center;justify-content:center;position:relative;z-index:40;
+    font-size:16.5px;font-weight:700;letter-spacing:3px;color:var(--ink)}
+  .navbar .back{position:absolute;left:12px;width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink);font-size:27px;
+    transition:background .2s}
+  .navbar .back:hover{background:rgba(60,70,60,.1)}
+  .navbar .navrec{position:absolute;right:12px;top:50%;transform:translateY(-50%);
+    display:flex;align-items:center;gap:4px;height:32px;padding:0 12px;border-radius:99px;
+    border:1px solid var(--line);background:#fbfaf6;color:var(--ink);font-size:12px;font-weight:600;
+    letter-spacing:1px;cursor:pointer;transition:all .2s}
+  .navbar .navrec:hover{border-color:var(--pine2);color:var(--pine2)}
+  .navbar .navrec .rn{font-size:10px;background:var(--pine2);color:#fff;border-radius:99px;
+    min-width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}
+  .reclist{padding:14px 16px 26px}
+  .reclist .recempty{text-align:center;color:#9aa096;padding:80px 30px;font-size:14px;line-height:2}
+  .reclist .recempty .big{font-size:40px;display:block;margin-bottom:14px;opacity:.5}
+  .reccard{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);
+    border-radius:16px;padding:11px;margin-bottom:12px;cursor:pointer;transition:all .2s}
+  .reccard:active{transform:scale(.985);border-color:var(--pine2)}
+  .reccard .rcimg{width:62px;height:62px;border-radius:12px;object-fit:cover;flex:0 0 62px;background:#f3f1ea}
+  .reccard .rcinfo{flex:1;min-width:0}
+  .reccard .rcname{font-weight:700;font-size:15px;color:var(--ink)}
+  .reccard .rcsub{font-size:12px;color:#8c9288;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .reccard .rcdate{font-size:11px;color:#b3b8af;margin-top:3px}
+  .reccard .rcprice{font-weight:700;color:var(--pine2);font-size:14px;margin-right:4px}
+  .recguess{margin:0 16px 12px;padding:14px 16px;border-radius:16px;background:#f4f7f0;border:1px solid #dce6d2}
+  .recguess h4{margin:0 0 10px;font-size:13px;color:var(--pine2);letter-spacing:1px}
+  .recguess .gitem{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px dashed #d4deca;cursor:pointer}
+  .recguess .gitem:first-of-type{border-top:0}
+  .recguess .gitem img{width:44px;height:44px;border-radius:10px;object-fit:cover;flex:0 0 44px}
+  .recguess .gitem .gn{font-size:14px;font-weight:600}
+  .recguess .gitem .gs{font-size:12px;color:#8c9288;margin-top:2px}
+
+  .pages{position:absolute;top:94px;left:0;right:0;bottom:0;overflow:hidden}
+  .page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+    opacity:0;pointer-events:none;transform:translateX(16px);
+    transition:opacity .26s ease,transform .26s ease;background:var(--paper)}
+  .page.show{opacity:1;pointer-events:auto;transform:translateX(0)}
+  .page::-webkit-scrollbar{display:none}
+
+  /* 饮品舞台：满铺渐隐 + 上升气泡 */
+  .stage{position:relative;width:100%;height:432px;overflow:visible;--travel:420px}
+  .stage img{width:100%;height:100%;object-fit:cover;display:block;
+    -webkit-mask-image:linear-gradient(to bottom,#000 56%,rgba(0,0,0,.7) 72%,transparent 97%);
+            mask-image:linear-gradient(to bottom,#000 56%,rgba(0,0,0,.7) 72%,transparent 97%)}
+  .bubbles{position:absolute;left:0;right:0;top:0;height:100%;overflow:hidden;pointer-events:none;z-index:3}
+  .bubbles i{position:absolute;bottom:-8px;border-radius:50%;
+    background:radial-gradient(circle at 32% 30%,rgba(255,255,255,.95),rgba(255,255,255,.18));
+    border:.6px solid rgba(255,255,255,.65);animation:rise linear infinite}
+  @keyframes rise{
+    0%{transform:translateY(0) scale(.55);opacity:0}
+    12%{opacity:.95}
+    88%{opacity:.7}
+    100%{transform:translateY(calc(var(--travel)*-1)) scale(1.05);opacity:0}}
+  .haze{position:absolute;left:-8%;right:-8%;bottom:-46px;height:150px;pointer-events:none;z-index:2;
+    background:
+      radial-gradient(42% 70% at 30% 60%,rgba(245,242,234,.92),transparent 70%),
+      radial-gradient(46% 78% at 64% 66%,rgba(241,239,232,.85),transparent 72%),
+      radial-gradient(34% 60% at 82% 52%,rgba(245,242,234,.7),transparent 72%);
+    filter:blur(9px);animation:drift 9s ease-in-out infinite alternate}
+  .haze.soft{opacity:.85}
+  @keyframes drift{from{transform:translateX(-7px)}to{transform:translateX(9px)}}
+  .topglow{position:absolute;top:-6px;left:0;right:0;height:90px;pointer-events:none;z-index:4;
+    background:linear-gradient(to bottom,rgba(245,242,234,.9),transparent)}
+
+  .titleblock{position:relative;text-align:center;margin:-34px 24px 0;z-index:5}
+  .titleblock .en{font-size:10.5px;letter-spacing:5px;color:var(--gold);font-weight:600}
+  .titleblock .n{font-size:33px;font-weight:700;letter-spacing:3px;color:var(--ink);margin-top:8px;
+    font-family:"Songti SC",serif}
+  .titleblock .hairline{width:40px;height:1px;background:var(--gold);margin:14px auto 0}
+
+  .prose{padding:26px 30px 6px;position:relative;z-index:2}
+  .prose .lab{font-size:11.5px;letter-spacing:4px;color:var(--pine);font-weight:700;
+    display:flex;align-items:center;gap:10px;margin-bottom:13px}
+  .prose .lab::before{content:"";width:20px;height:1px;background:var(--gold)}
+  .prose .lab::after{content:"";flex:1;height:1px;background:linear-gradient(to right,var(--line),transparent)}
+  .prose p{font-size:14.5px;line-height:2.05;color:#54564e;margin:0}
+  .dateline{font-size:11px;letter-spacing:2px;color:var(--ink3);padding:4px 30px 0}
+
+  .priceplain{display:flex;align-items:baseline;gap:9px;padding:22px 30px 4px}
+  .priceplain b{font-size:31px;font-weight:800;color:var(--ink)}
+  .priceplain span{font-size:11px;letter-spacing:1.5px;color:var(--ink2)}
+
+  .cta{margin:20px 28px 30px;height:55px;border-radius:99px;border:0;cursor:pointer;
+    background:var(--pine);color:#eef1ec;font-size:15px;font-weight:600;
+    letter-spacing:6px;box-shadow:0 18px 32px -18px rgba(45,60,50,.7);width:calc(100% - 56px);
+    transition:transform .18s,background .18s}
+  .cta:hover{background:var(--pine2)}
+  .cta:active{transform:scale(.975)}
+
+  /* 首页：选项用轻盈卡片，层次清晰但不厚重 */
+  .home-hero{padding:36px 28px 6px;text-align:center;position:relative}
+  .home-hero .kicker{font-size:10.5px;letter-spacing:7px;color:var(--gold);font-weight:600}
+  .home-hero h1{font-size:30px;line-height:1.5;margin:20px 0 0;color:var(--ink);font-weight:700;
+    font-family:"Songti SC",serif;letter-spacing:1px}
+  .home-hero h1 .em{color:var(--pine)}
+  .home-hero .sub{font-size:11px;color:var(--ink3);letter-spacing:5px;margin-top:16px}
+  .home-hero .rule{width:46px;height:1px;background:var(--gold);margin:18px auto 0}
+
+  .home-menu{padding:22px 22px 10px;display:flex;flex-direction:column;gap:13px}
+  .hopt{display:flex;align-items:center;gap:16px;padding:17px 18px;cursor:pointer;
+    background:var(--ivory);border:1px solid var(--line);border-radius:20px;
+    box-shadow:0 10px 24px -20px rgba(60,70,60,.5);
+    transition:transform .26s cubic-bezier(.2,.8,.2,1),box-shadow .26s,border-color .26s}
+  .hopt:hover{transform:scale(1.035);border-color:var(--gold);
+    box-shadow:0 20px 34px -22px rgba(90,110,90,.6)}
+  .hopt:active{transform:scale(1.01)}
+  .hopt .badge{width:52px;height:52px;border-radius:15px;flex:0 0 52px;display:flex;
+    align-items:center;justify-content:center;background:var(--pineSoft);
+    box-shadow:inset 0 0 0 1px #d2d9d1}
+  .hopt .txt b{font-size:18px;font-weight:700;letter-spacing:2px;display:block;font-family:"Songti SC",serif}
+  .hopt .txt span{font-size:12px;color:var(--ink2);letter-spacing:.5px}
+  .hopt .go{margin-left:auto;color:#c2c0b4;font-size:20px;transition:transform .25s,color .25s}
+  .hopt:hover .go{transform:translateX(4px);color:var(--pine)}
+  .home-foot{text-align:center;color:#aaaca2;font-size:10.5px;letter-spacing:5px;padding:12px 0 6px}
+
+  /* 聊天 */
+  .chatwrap{display:flex;flex-direction:column;height:100%;background:var(--paper)}
+  .chatlist{flex:1;overflow-y:auto;padding:20px 16px 8px}
+  .chatlist::-webkit-scrollbar{display:none}
+  .cmsg{display:flex;margin-bottom:15px}
+  .cmsg.user{justify-content:flex-end}
+  .cb{max-width:82%;padding:13px 16px;border-radius:19px;font-size:14.5px;line-height:1.7}
+  .cmsg.ai .cb{background:#fbfaf6;border:1px solid var(--line);border-top-left-radius:6px;
+    color:#3f413b;box-shadow:0 8px 22px -18px rgba(50,60,50,.5)}
+  .cmsg.user .cb{background:var(--pine);color:#eef1ec;border-top-right-radius:6px}
+  .cai-av{width:34px;height:34px;border-radius:12px;background:var(--pineSoft);
+    display:flex;align-items:center;justify-content:center;margin-right:9px;flex:0 0 34px;
+    box-shadow:inset 0 0 0 1px #d2d9d1}
+
+  .aiprev{margin-top:13px;border-radius:18px;overflow:hidden;background:#fbfaf6;
+    box-shadow:0 16px 32px -24px rgba(50,60,50,.6)}
+  .aiprev .pv-img{position:relative;height:210px;--travel:200px}
+  .aiprev .pv-img img{width:100%;height:calc(100% + 34px);object-fit:cover;display:block;transition:opacity .5;transform:translateY(-17px)}
+  .aiprev .pv-img{overflow:hidden}
+  .genload{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:11px;background:#f1efe8;color:#7a8278;font-size:12.5px;letter-spacing:1px}
+  .aiprev .ab{padding:13px 15px 15px}
+  .aiprev .ab b{font-size:17px;letter-spacing:1.5px;font-family:"Songti SC",serif}
+  .aiprev .ab .desc{display:block;font-size:12px;color:var(--ink2);margin-top:6px;line-height:1.7}
+  .aiprev .ab .alead{display:block;font-size:12.5px;color:var(--tea,#8a6a3b);margin-top:8px;line-height:1.7;font-style:italic}
+  .aiprev .ab .ablk{margin-top:11px;padding-top:10px;border-top:1px dashed #e7e0d2}
+  .aiprev .ab .atag{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:1px;color:#fff;background:linear-gradient(135deg,#b08d57,#8a6a3b);padding:2px 9px;border-radius:99px;margin-bottom:6px}
+  .aiprev .ab .atxt{margin:0;font-size:12px;color:var(--ink2);line-height:1.75}
+  .aiprev .ab .alayers{list-style:none;margin:0;padding:0}
+  .aiprev .ab .alayers li{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:var(--ink2);line-height:1.7;margin-top:4px}
+  .aiprev .ab .alayers li i{flex:0 0 18px;height:18px;border-radius:50%;background:#f0e8d8;color:#8a6a3b;font-style:normal;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .aiprev .abtns{display:flex;gap:10px;margin-top:14px}
+  .aiprev .abtns button{flex:1;height:44px;border-radius:99px;font-size:14px;font-weight:600;cursor:pointer;
+    letter-spacing:3px;transition:transform .15s}
+  .aiprev .abtns button:active{transform:scale(.95)}
+  .bstart{border:0;background:var(--pine);color:#eef1ec}
+  .breject{border:1.5px solid var(--line);background:transparent;color:var(--ink2)}
+
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:8px 14px}
+  .chips button{flex:0 0 auto;border:1px solid var(--line);background:#fbfaf6;border-radius:99px;
+    padding:8px 15px;font-size:12.5px;color:#5f6b5d;cursor:pointer;white-space:nowrap;transition:.2s}
+  .chips button:hover{border-color:var(--pine2);color:var(--pine)}
+  .chatinput{display:flex;gap:9px;padding:10px 14px 18px;background:var(--paper)}
+  .chatinput input{flex:1;border:1px solid var(--line);background:#fbfaf6;border-radius:99px;
+    padding:12px 18px;font-size:14.5px;outline:none}
+  .chatinput input:focus{border-color:var(--pine2)}
+  .chatinput button{border:0;width:47px;height:47px;border-radius:50%;cursor:pointer;font-size:18px;flex:0 0 47px;
+    background:var(--pine);color:#eef1ec}
+  .typing{display:inline-flex;gap:4px;padding:3px}
+  .typing i{width:7px;height:7px;border-radius:50%;background:#b3bcb0;animation:blink 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.3}30%{opacity:1}}
+
+  /* 调配 */
+  .conf{padding:0 0 26px}
+  .cgroup{padding:24px 30px 4px;position:relative}
+  .cgroup + .cgroup::before{content:"";position:absolute;top:0;left:48px;right:48px;height:1px;
+    background:linear-gradient(to right,transparent,var(--line) 30%,var(--line) 70%,transparent)}
+  .cgroup .clab{font-size:12px;letter-spacing:4px;color:var(--pine);font-weight:700;margin-bottom:16px}
+  .cgroup .multi{font-weight:400;color:var(--ink2);letter-spacing:1px;font-size:11px}
+  .addp{font-style:normal;color:var(--pine2);font-size:12px;margin-left:2px}
+  .seg{display:flex;gap:6px;background:#edebe4;border:1px solid var(--line);border-radius:16px;padding:5px}
+  .seg.seg4{gap:3px}
+  .seg button{flex:1;padding:9px 2px;border:0;background:transparent;border-radius:12px;font-size:12.5px;
+    color:var(--ink2);cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:3px}
+  .seg button .sic{display:flex;height:16px;align-items:center}
+  .seg button.on{background:#fff;color:var(--pine);font-weight:700;box-shadow:0 6px 15px -9px rgba(50,60,50,.6)}
+  .switchrow{display:flex;align-items:center;justify-content:space-between;padding:9px 0}
+  .switchrow .lb{font-size:14.5px;color:#40423c}
+  .switch{width:50px;height:29px;border-radius:99px;background:#d6d4ca;position:relative;cursor:pointer;transition:.22s}
+  .switch i{position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,.18);transition:.22s}
+  .switch.on{background:var(--pine)}
+  .switch.on i{left:24px}
+
+  .summary{margin:26px 30px 0}
+  .summary .srow{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:9px 0;color:#686a62}
+  .summary .srow span:last-child{color:#40423c;font-weight:600;font-style:normal}
+  .summary i{font-style:normal;font-size:12px;font-weight:600}
+  .summary .plus{color:#b07a3a}
+  .summary .minus{color:#4f8060}
+  .summary .zero{color:#a9aba2;font-weight:400}
+  .summary .basep{color:#40423c;font-weight:700}
+  .summary .stotal{display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid var(--line);margin-top:8px;padding-top:18px}
+  .summary .stotal span{font-size:12px;letter-spacing:3px;color:var(--ink2)}
+  .summary .stotal b{font-size:29px;color:var(--pine);font-weight:800}
+
+  /* 付款 */
+  .pay{padding:10px 30px 28px;text-align:center}
+  .pay .payamt{font-size:40px;font-weight:800;margin:14px 0 4px;color:var(--ink)}
+  .pay .paytip{font-size:11.5px;color:var(--ink2);letter-spacing:3px}
+  .paymethods{display:flex;gap:12px;margin:24px 0 0}
+  .pmethod{flex:1;display:flex;align-items:center;gap:8px;background:var(--ivory);
+    border:1.5px solid var(--line);border-radius:16px;padding:12px 10px;cursor:pointer;transition:.2s}
+  .pmethod.on{border-color:var(--pine);background:#fff;box-shadow:0 10px 22px -18px rgba(50,60,50,.7)}
+  .pmethod .pmi{display:flex}
+  .pmethod .pmn{font-size:13px;font-weight:600;color:#3f413b}
+  .pmethod .pcheck{margin-left:auto;width:19px;height:19px;border-radius:50%;background:#d6d4ca;
+    color:transparent;font-size:12px;display:flex;align-items:center;justify-content:center}
+  .pmethod.on .pcheck{background:var(--pine);color:#fff}
+  .pay .qr-card{position:relative;margin:28px auto 0;background:#fff;border:1px solid var(--line);
+    border-radius:22px;padding:20px;width:256px;box-shadow:0 24px 46px -28px rgba(50,60,50,.6)}
+  .pay .qr-card img{width:214px;height:214px;display:block;margin:0 auto;border-radius:12px}
+  .pay .qrbrand{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:14px;
+    font-size:13.5px;font-weight:700;font-family:"Songti SC",serif}
+  .pay .qrnote{font-size:10.5px;color:var(--ink3);margin-top:7px;letter-spacing:.5px}
+  .payscan{margin-top:24px;height:54px;border-radius:99px;border:0;width:100%;cursor:pointer;
+    background:var(--pine);color:#eef1ec;font-size:15px;font-weight:600;letter-spacing:5px;
+    transition:transform .15s,background .15s}
+  .payscan:active{transform:scale(.97)}
+  .payscan.done{background:#5f8a6c}
+
+  /* ===== 新付款页 ===== */
+  .pay2{padding:38px 30px 30px;min-height:100%;display:flex;flex-direction:column}
+  .payamt2{text-align:center;font-size:52px;font-weight:800;color:#23271f;letter-spacing:1px}
+  .paycap2{text-align:center;font-size:11.5px;color:#9a9d93;letter-spacing:3px;margin-top:6px}
+  .paymethods2{display:flex;gap:12px;margin:30px 0 0}
+  .pm2{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:#fbfaf6;
+    border:1.5px solid var(--line);border-radius:15px;padding:13px 8px;font-size:13.5px;font-weight:600;
+    color:#4a4d45;cursor:pointer;transition:.2s}
+  .pm2.on{border-color:#43584a;background:#fff;box-shadow:0 10px 22px -18px rgba(50,60,50,.7);color:#23271f}
+  .payprimary{margin-top:30px;height:60px;border:0;border-radius:99px;cursor:pointer;
+    background:linear-gradient(120deg,#43584a,#324438);color:#f1f4ef;font-size:17px;font-weight:700;
+    letter-spacing:2px;box-shadow:0 22px 38px -20px rgba(45,60,50,.75);transition:transform .15s,filter .2s}
+  .payprimary:active{transform:scale(.98)}
+  .payprimarysub{text-align:center;font-size:11px;color:#9a9d93;margin-top:12px;letter-spacing:.5px}
+
+  /* 固定金额支付提示 */
+  .qrlock{margin:14px 18px 0;font-size:11px;color:#7c8477;background:#eef1ea;border:1px solid #dde5dc;
+    border-radius:12px;padding:9px 12px;line-height:1.6;letter-spacing:.3px}
+  .qrhint{margin:13px 24px 0;font-size:11px;color:#8a9285;text-align:center;letter-spacing:.3px}
+
+  /* 饮品选择 */
+  .ghead{padding:26px 30px 6px}
+  .ghead .pt{font-size:13px;letter-spacing:5px;color:var(--pine);font-weight:700}
+  .ghead .pe{font-size:11.5px;color:var(--ink2);margin-top:7px}
+  .grid2{padding:14px 22px 26px;display:grid;grid-template-columns:1fr 1fr;gap:22px 16px}
+  .gitem{cursor:pointer;transition:transform .24s}
+  .gitem:hover{transform:translateY(-5px)}
+  .gitem .gimg{border-radius:22px;overflow:hidden;box-shadow:0 18px 36px -24px rgba(50,60,50,.6)}
+  .gitem .gimg img{width:100%;height:168px;object-fit:cover;display:block}
+  .gitem .gname{text-align:center;margin-top:11px;font-size:14.5px;letter-spacing:1.5px;font-weight:700;
+    font-family:"Songti SC",serif}
+  .gitem .gprice{text-align:center;font-size:11px;color:var(--pine2);margin-top:4px;letter-spacing:1px}
+
+  /* 加载转圈（支付弹层等使用） */
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .milktype{display:flex;gap:7px;margin-top:11px}
+  .milktype .mto{flex:1;border:1px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;font-size:11px;color:var(--ink3);background:#fff;transition:.18s}
+  .milktype .mto b{display:block;font-size:13px;color:var(--ink);margin-bottom:1px}
+  .milktype .mto.on{border-color:var(--pine);background:rgba(58,90,64,.08);box-shadow:0 4px 12px rgba(58,90,64,.1)}
+  .milktype .mto.on b{color:var(--pine2)}
+  .milktype .mto span{display:block;height:13px;line-height:13px}
+  .lfrom{margin-top:6px;font-size:10.5px;color:var(--ink3);display:flex;align-items:center;gap:4px}
+  .lfrom .lf-dot{color:var(--pine2)}
+  .lrefbtn{margin-top:8px;font-size:10.5px;color:#b06a4f;border:1px solid rgba(176,106,79,.35);background:rgba(176,106,79,.06);border-radius:9px;padding:5px 10px}
+  .lrefbtn:active{transform:scale(.97)}
+  /* 店主个人微信收款弹层（展示收款码+订单码，等待店主核对，不做密码键盘） */
+  .wxoverlay{position:absolute;inset:0;z-index:120;background:rgba(20,24,20,.55);
+    display:none;align-items:center;justify-content:center;padding:30px}
+  .wxoverlay.show{display:flex}
+  .wxcard{width:100%;background:#f7f8f7;border-radius:22px;padding:24px 22px 14px;text-align:center;
+    animation:popIn .25s ease;max-height:100%;overflow:auto}
+  @keyframes popIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .wxbrand{font-size:14px;color:#55605a;display:flex;align-items:center;justify-content:center;gap:6px}
+  .wxamount{font-size:38px;font-weight:700;color:#16201a;margin-top:12px}
+  .wxamount small{font-size:19px;margin-right:2px}
+  .wxpayee{font-size:11.5px;color:#8a948c;margin-top:6px}
+  .wxspin{width:18px;height:18px;border:2px solid rgba(58,90,64,.25);border-top-color:#3a5240;border-radius:50%;
+    display:inline-block;animation:spin .8s linear infinite;flex:none}
+  .wxok{flex:1;text-align:center;font-size:15px;color:#fff;background:#07c160;border-radius:22px;padding:12px 0;font-weight:600}
+  .wxok:active{filter:brightness(.94)}
+  .wxtip{font-size:10.5px;color:#9aa39b;line-height:1.7;margin-top:8px}
+  .wxcancel{width:110px;text-align:center;padding:12px 0;font-size:15px;color:#7a857d}
+  .wxqr{margin:12px auto 4px;width:204px;height:204px;background:#fff;border:1px solid #e3e7e2;border-radius:14px;
+    padding:8px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .wxqr img{width:100%;height:100%;display:block;object-fit:contain}
+  .wxqrph{color:#9aa39b;font-size:30px;line-height:1.5}
+  .wxqrph div{font-size:13px;color:#5a655e;margin-top:4px}
+  .wxqrph small{font-size:10px;color:#a8b0a9;font-weight:400}
+  .wxstep{margin-top:4px}
+  .wxcodeline{font-size:11.5px;color:#5a655e;line-height:1.6}
+  .wxordercode{margin:8px auto 2px;display:inline-block;font-size:24px;font-weight:700;letter-spacing:6px;color:#07c160;
+    background:#e8f8ef;border:1px dashed #7bd3a4;border-radius:10px;padding:6px 18px;font-variant-numeric:tabular-nums}
+  #wxStep2{display:flex;align-items:center;gap:9px;justify-content:center;margin:16px 4px;font-size:13px;color:#3a5240;line-height:1.6}
+  .wxbtnrow{display:flex;align-items:center;gap:10px;margin-top:10px;border-top:1px solid #e7eae7;padding-top:6px}
+  .wxokbig{width:58px;height:58px;border-radius:50%;background:#07c160;color:#fff;font-size:30px;
+    display:grid;place-items:center;margin:6px auto 12px;animation:popIn .3s ease}
+  .wxoktitle{font-size:17px;font-weight:700;color:#16201a}
+  .wxoksub{font-size:12px;color:#7c877f;margin-top:6px;line-height:1.7}
+  .wxoksub b{color:#07c160;letter-spacing:2px;font-variant-numeric:tabular-nums}
+  .wxokbtn{margin:16px 0 4px;height:46px;border-radius:23px;background:#07c160;color:#fff;font-size:15px;
+    font-weight:600;display:grid;place-items:center;letter-spacing:4px;cursor:pointer}
+  .wxokbtn:active{filter:brightness(.94)}
+  .cashier-paybtn.done{background:linear-gradient(120deg,#2bb36b,#15944d)}
+  .paycheck{font-size:15px;margin-right:4px}
+  /* 收银台页 */
+  .cashier{padding:0}
+  .cashier-top{background:#fff;padding:26px 22px;text-align:center}
+  .cashier-payee{font-size:13px;color:#5a655e}
+  .cashier-amount{font-size:40px;font-weight:700;color:#16201a;margin-top:14px}
+  .cashier-amount small{font-size:18px;font-weight:600;margin-right:2px}
+  .cashier-body{margin-top:10px;background:#fff}
+  .cashier-row{display:flex;justify-content:space-between;align-items:center;padding:16px 22px;
+    border-bottom:1px solid #eef1ee;font-size:14px;color:#323d36}
+  .cashier-row span:last-child{color:#7c877f}
+  .cashier-paybtn{margin:26px 22px;height:52px;border:none;border-radius:26px;color:#fff;font-size:16px;
+    letter-spacing:2px;background:linear-gradient(120deg,#22a35b,#15944d);width:calc(100% - 44px)}
+  .cashier-vnote{text-align:center;font-size:11px;color:#98a29a;margin:14px 0 26px;line-height:1.8}
+  .cashier-vnote b{color:var(--pine2)}
+  .pmi{display:inline-flex;vertical-align:-2px;margin-right:4px}
+  .cashier .pcheck{font-style:normal;color:#c6cac0;font-size:15px}
+  .cashier .pcheck.on{color:var(--pine,#2f5d43);font-weight:700}
+  /* ===== 账本（饮料机记账） ===== */
+  .ledger{padding:4px 20px 26px}
+  .ld-head{padding:6px 2px 14px}
+  .ld-title{font-size:22px;font-weight:700;color:#1b251e;letter-spacing:1px}
+  .ld-sub{font-size:12px;color:#8b948c;margin-top:5px}
+  .ld-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .ld-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 15px}
+  .ld-card .k{font-size:11.5px;color:#8b948c;letter-spacing:1px}
+  .ld-card .v{font-size:24px;font-weight:700;margin-top:9px;color:#1b251e}
+  .ld-card.income .v{color:#2f7d52}
+  .ld-card.refund .v{color:#c0563f}
+  .ld-card.full{grid-column:1 / -1;display:flex;justify-content:space-between;align-items:center}
+  .ld-card.full .v{margin-top:4px;color:#b5892e}
+  .ld-card.full .cnt{font-size:11px;color:#a3aba4;margin-top:6px}
+  /* 记录操作 */
+  .ld-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .ld-add{border-radius:14px;padding:15px;font-size:13px;font-weight:600;text-align:center;cursor:pointer;
+    border:1px solid var(--line);background:#fff}
+  .ld-add.income b{color:#2f7d52}
+  .ld-add.refund b{color:#c0563f}
+  .ld-add span{display:block;font-size:10.5px;font-weight:400;color:#93a097;margin-top:4px}
+  /* 流水 */
+  .ld-list{margin-top:20px}
+  .ld-list-h{font-size:13px;font-weight:700;color:#32403a;display:flex;justify-content:space-between;align-items:center}
+  .ld-list-h a{font-size:11px;color:#9aa29b;font-weight:400}
+  .ld-item{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);
+    border-radius:13px;padding:13px 14px;margin-top:10px}
+  .ld-ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
+  .ld-ic.in{background:#eaf6ef}
+  .ld-ic.out{background:#fbeeea}
+  .ld-mid{flex:1;min-width:0}
+  .ld-mid .t1{font-size:13px;color:#2a352e;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ld-mid .t2{font-size:10.5px;color:#9aa29b;margin-top:3px}
+  .ld-amt{font-size:15px;font-weight:700}
+  .ld-amt.in{color:#2f7d52}
+  .ld-amt.out{color:#c0563f}
+  .ld-empty{text-align:center;color:#a9b1ab;font-size:12px;padding:34px 0}
+  /* 记账弹窗 */
+  .ldlay{position:absolute;inset:0;background:rgba(20,24,20,.5);z-index:220;display:flex;align-items:flex-end}
+  .ldbox{width:100%;background:#f7f8f7;border-radius:20px 20px 0 0;padding:22px 22px 14px;position:relative;
+    animation:slideUp .28s ease}
+  .ldbox .ldx{position:absolute;top:12px;left:16px;font-size:24px;color:#9aa39b}
+  .ldbox h3{text-align:center;font-size:15px;color:#1f2a23;font-weight:700}
+  .ldbox .fld{margin-top:16px}
+  .ldbox label{display:block;font-size:12px;color:#6c766e;margin-bottom:6px}
+  .ldbox input{width:100%;border:1px solid #d6dcd6;border-radius:10px;padding:11px 12px;font-size:14px;
+    background:#fff;box-sizing:border-box}
+  .ldbox .ldok{width:100%;margin-top:20px;height:48px;border:none;border-radius:24px;color:#fff;font-size:15px;
+    background:linear-gradient(120deg,#2f5d43,#264d36)}
+  .ldbox .lderr{color:#c0563f;font-size:12px;text-align:center;min-height:16px;margin-top:10px}
+</style>
+</head>
+<body>
+<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">饮料机 · AI智能调配茶饮小程序</h1>
+
+  <div class="brief">
+    <h2>饮料机</h2>
+    <p>AI 智能调配 · 高保真原型。画面与背景自然交融，可点击体验完整下单流程。</p>
+    <div>
+      <span class="tag">每日推荐</span><span class="tag">AI 配比</span><span class="tag">饮品选择</span>
+      <span class="tag">微信付款给店主</span>
+    </div>
+    <p style="margin-top:14px">首页选项<b>悬停放大</b>；每个内页左上角均有<b>返回键</b>。</p>
+  </div>
+
+  <div class="phone">
+    <div class="screen">
+      <div class="notch"></div>
+      <div class="statusbar">
+        <span>9:41</span>
+        <span style="display:flex;gap:6px;align-items:center;font-size:13px">
+          <span style="letter-spacing:1px">●●●</span><span>📶</span><span>🔋</span>
+        </span>
+      </div>
+      <div class="navbar" id="navbar"><span id="navtitle"></span></div>
+      <div class="pages" id="pages"></div>
+    </div>
+  </div>
+
+<script>
+/* ===== 用户提供的原图（已按你的纠正重新对应名称） ===== */
+var IMG={
+  d1:"https://www.coze.cn/s/TxXg7XVRxxY/",  /* 橙香醒力饮：纯橙橙子 */
+  d2:"https://www.coze.cn/s/Dt9Op9hhlJ4/",  /* 茶云舒润饮：蝴蝶奶茶 */
+  feng:"https://www.coze.cn/s/m3Hd3OotAv8/",/* 橙风疏沁饮：浅淡竹叶橙 */
+  rou:"https://www.coze.cn/s/ZzD8jY9vjy0/", /* 橙柔云萃饮：更橙的竹叶橙 */
+  aiHot:"https://www.coze.cn/s/4e3fDJa-37Q/",  /* 热的提神 */
+  aiFizz:"https://www.coze.cn/s/rFp19tzqgQw/", /* 清爽带气泡 */
+  aiLight:"https://www.coze.cn/s/ok7xYY_vy3M/",/* 不要太甜·清淡 */
+  aiMilk:"https://www.coze.cn/s/suWeVhlLQss/", /* 奶香浓郁 */
+  ai:"https://www.coze.cn/s/0WgIi1S0kQU/",     /* AI特调默认 */
+  wxPay:"https://www.coze.cn/s/PtB3iSe2l-c/"   /* 微信个人收款码（兜底扫码） */
+};
+/* 数组下标用于“每日轮换”；ord 用于饮品选择页的规范顺序 */
+var DRINKS=[
+  {id:"d1",name:"橙香醒力饮",en:"ORANGE ENERGY",price:16,ord:0,
+   reason:"清晨或午后犯困时，明亮橙香与清茶迅速唤醒状态，酸甜提神、冰凉通透，是今天最适合给身体“开机”的一杯。"},
+  {id:"d2",name:"茶云舒润饮",en:"TEA CLOUD",price:15,ord:1,
+   reason:"干燥或需要放松时，温润红茶香遇上丝滑奶香，柔和不刺激，像给喉咙和心情盖上一层柔软的云。"},
+  {id:"feng",name:"橙风疏沁饮",en:"FRESH BREEZE",price:14,ord:3,
+   reason:"餐后或闷热时，清透乌龙茶香托着明亮橙香与一丝果酸，满杯冰爽、一扫油腻，像迎面吹来一阵干净的风。"},
+  {id:"rou",name:"橙柔云萃饮",en:"CLOUD ORANGE",price:17,ord:2,
+   reason:"想被温柔款待时，橙香与茶香交融、口感丝滑，酸甜恰到好处，治愈又有小小的满足感。"}
+];
+function imgOf(d){return IMG[d.id];}
+function drinkById(id){for(var i=0;i<DRINKS.length;i++)if(DRINKS[i].id===id)return DRINKS[i];return DRINKS[0];}
+function dailyIndex(){var n=new Date(),s=new Date(n.getFullYear(),0,0);return Math.floor((n-s)/86400000)%4;}
+function todayStr(){var n=new Date();return n.getFullYear()+"年"+(n.getMonth()+1)+"月"+n.getDate()+"日";}
+var ctx={drinkId:"d1",aiName:"",aiImg:"",aiType:"",aiDesc:"",aiLead:"",aiWhy:"",aiLayers:[],aiBenefit:"",aiMeaning:"",aiPrice:18,lastPrice:0,isAI:false,targetBudget:0,aiTier:0};
+/* 扫码即用，无需注册登录；支付直接拉起微信支付，密码/指纹由微信与手机系统验证，本小程序不自造密码 */
+
+/* ==================================================================
+   LEDGER —— 饮料机记账（收入 / 退款支出 + 时间），localStorage 持久化
+   ================================================================== */
+var LEDGER={
+  KEY:"drink_machine_ledger_v1",
+  mem:null,
+  load:function(){
+    if(this.mem)return this.mem;
+    this.mem=[];
+    try{
+      var raw=window.localStorage.getItem(this.KEY);
+      if(raw)this.mem=JSON.parse(raw)||[];
+    }catch(e){this.mem=[];}
+    return this.mem;
+  },
+  save:function(){
+    try{window.localStorage.setItem(this.KEY,JSON.stringify(this.mem));}catch(e){}
+  },
+  add:function(kind,amount,item,method,extra){
+    var list=this.load();
+    var now=new Date();
+    var rec={
+      id:"L"+now.getTime()+String(Math.floor(Math.random()*900)+100),
+      kind:kind,                 // income | refund
+      amount:Math.round(Number(amount)*100)/100,
+      item:item||(kind==="income"?"饮品销售":"退款"),
+      method:method||"",
+      from:(extra&&extra.from)||"",        // 来自谁（手机号掩码）
+      cost:extra&&extra.cost!=null?Math.round(extra.cost*100)/100:0,
+      refOf:(extra&&extra.refOf)||"",      // 退款对应的收入记录 id
+      ts:now.getTime()
+    };
+    list.unshift(rec);
+    this.save();
+    return rec;
+  },
+  addIncome:function(amount,item,method,extra){return this.add("income",amount,item,method,extra);},
+  addRefund:function(amount,item,method,extra){return this.add("refund",amount,item,method,extra);},
+  totals:function(){
+    var income=0,refund=0,cost=0,incN=0,refN=0;
+    this.load().forEach(function(r){
+      if(r.kind==="refund"){refund+=r.amount;refN++;}
+      else{income+=r.amount;cost+=(r.cost||0);incN++;}
+    });
+    function r2(x){return Math.round(x*100)/100;}
+    return {income:r2(income),refund:r2(refund),cost:r2(cost),
+      net:r2(income-refund),
+      profit:r2(income-refund-cost),
+      incN:incN,refN:refN};
+  },
+  markRefunded:function(id){
+    this.load().forEach(function(r){if(r.id===id)r.refunded=true;});
+    this.save();
+  },
+  reset:function(){this.mem=[];this.save();}
+};
+function maskPhone(s){if(!s)return"";if(s.length<7)return s;
+  return s.slice(0,3)+"****"+s.slice(7);}
+function ledgerTime(ts){
+  var d=new Date(ts),p2=function(n){return (n<10?"0":"")+n;};
+  return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate())+" "+
+    p2(d.getHours())+":"+p2(d.getMinutes())+":"+p2(d.getSeconds());
+}
+function ledgerHM(ts){
+  var d=new Date(ts),p2=function(n){return (n<10?"0":"")+n;};
+  return p2(d.getHours())+":"+p2(d.getMinutes());
+}
+
+
+
+
+/* ===== 线条图标 ===== */
+var ICON={
+  sun:'<svg width="23" height="23" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="#5f7a66"/><g stroke="#5f7a66" stroke-width="1.8" stroke-linecap="round"><line x1="12" y1="3" x2="12" y2="4.8"/><line x1="12" y1="19.2" x2="12" y2="21"/><line x1="3" y1="12" x2="4.8" y2="12"/><line x1="19.2" y1="12" x2="21" y2="12"/><line x1="5.6" y1="5.6" x2="6.9" y2="6.9"/><line x1="17.1" y1="17.1" x2="18.4" y2="18.4"/><line x1="18.4" y1="5.6" x2="17.1" y2="6.9"/><line x1="6.9" y1="17.1" x2="5.6" y2="18.4"/></g></svg>',
+  spark:'<svg width="23" height="23" viewBox="0 0 24 24"><path d="M12 3.5l1.7 4.9 4.9 1.7-4.9 1.7L12 16.7l-1.7-4.9L5.4 10.1l4.9-1.7z" fill="#43584a"/><path d="M18 14.8l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="#8a9a87"/></svg>',
+  cup:'<svg width="23" height="23" viewBox="0 0 24 24"><path d="M7.4 4.4h9.2l-.9 13.3a2 2 0 0 1-2 1.8h-3.4a2 2 0 0 1-2-1.8z" fill="#5f7a66"/><path d="M16.6 6.4h1.9a1.7 1.7 0 0 1 0 3.4h-2.2" stroke="#5f7a66" stroke-width="1.7"/><rect x="8.4" y="2.4" width="7.2" height="1.6" rx=".8" fill="#8a9a87"/></svg>',
+  book:'<svg width="23" height="23" viewBox="0 0 24 24"><path d="M5 4.8a1.4 1.4 0 0 1 1.4-1.4h10.4A1.6 1.6 0 0 1 18.4 5v14.2H6.4A1.4 1.4 0 0 1 5 17.8z" fill="#5f7a66"/><path d="M18.4 5v14.2" stroke="#f4f2ea" stroke-width="1.2"/><g stroke="#f4f2ea" stroke-width="1.3" stroke-linecap="round"><line x1="8.3" y1="8.2" x2="14.2" y2="8.2"/><line x1="8.3" y1="11" x2="14.2" y2="11"/><line x1="8.3" y1="13.8" x2="11.8" y2="13.8"/></g></svg>'
+};
+
+/* 奶量水滴：高度由空到满，差异明显 */
+function dropSVG(fill){
+  var heights=[0,6,11,16],h=heights[fill],y=21-h;
+  return '<svg width="17" height="17" viewBox="0 0 24 24">'+
+    '<path d="M12 2.5C12 2.5 5 11 5 16a7 7 0 0 0 14 0C19 11 12 2.5 12 2.5z" fill="#e9ece6" stroke="#a9b4ab" stroke-width="1.6"/>'+
+    '<clipPath id="mz'+fill+'"><path d="M12 2.5C12 2.5 5 11 5 16a7 7 0 0 0 14 0C19 11 12 2.5 12 2.5z"/></clipPath>'+
+    (h>0?'<rect x="5" y="'+y+'" width="14" height="'+h+'" fill="#5f7a66" clip-path="url(#mz'+fill+')"/>':'')+'</svg>';
+}
+var MILKICON=[dropSVG(0),dropSVG(1),dropSVG(2),dropSVG(3)];
+/* 糖量方糖 */
+function sugarSVG(n){
+  var cubes="",pos=[[3.5,9],[10.5,5],[7.5,12.5],[14.5,10.5]];
+  for(var i=0;i<n;i++){var p=pos[i];
+    cubes+='<rect x="'+p[0]+'" y="'+p[1]+'" width="5.4" height="5.4" rx="1.2" fill="#d0ba8b" stroke="#b29a68" stroke-width=".8"/>';}
+  return '<svg width="18" height="17" viewBox="0 0 24 20">'+cubes+'</svg>';
+}
+var SUGARICON=[sugarSVG(0),sugarSVG(1),sugarSVG(2),sugarSVG(4)];
+
+/* 上升气泡 */
+function bubblesHTML(n){
+  var s="",seed=3;
+  function rnd(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+  for(var i=0;i<n;i++){
+    var size=(3+rnd()*9).toFixed(1),left=(rnd()*94).toFixed(1),
+        dur=(3.2+rnd()*3.6).toFixed(2),delay=(-rnd()*6).toFixed(2);
+    s+='<i style="left:'+left+'%;width:'+size+'px;height:'+size+'px;animation-duration:'+dur+'s;animation-delay:'+delay+'s"></i>';
+  }
+  return '<div class="bubbles">'+s+'</div>';
+}
+
+function stageHTML(d,extraClass){
+  return '<div class="stage '+(extraClass||'')+'"><div class="topglow"></div>'+
+    '<img src="'+imgOf(d)+'"><div class="haze"></div></div>';
+}
+
+var T={};
+T.home=function(){
+  return '<div class="home-hero">'+
+    '<div class="kicker">A I · T E A</div>'+
+    '<h1>渴了吗，<br>购买 <span class="em">AI 饮料机</span></h1>'+
+    '<div class="sub">一 杯 懂 你 的 好 茶</div><div class="rule"></div></div>'+
+    '<div class="home-menu">'+
+      '<div class="hopt" data-go="daily"><div class="badge">'+ICON.sun+'</div>'+
+        '<div class="txt"><b>每日推荐</b><span>今日限定灵感特调</span></div><div class="go">›</div></div>'+
+      '<div class="hopt" data-go="ai"><div class="badge">'+ICON.spark+'</div>'+
+        '<div class="txt"><b>AI 配比</b><span>说出喜好，为你定制</span></div><div class="go">›</div></div>'+
+      '<div class="hopt" data-go="select"><div class="badge">'+ICON.cup+'</div>'+
+        '<div class="txt"><b>饮品选择</b><span>四款招牌，任你挑选</span></div><div class="go">›</div></div>'+
+    '</div><div class="home-foot">S I P · T H E · F U T U R E</div>';
+};
+
+T.daily=function(){
+  var d=DRINKS[dailyIndex()];ctx.drinkId=d.id;ctx.isAI=false;ctx.targetBudget=0;ctx.aiTier=0;
+  return stageHTML(d)+
+    '<div class="titleblock"><div class="en">'+d.en+'</div><div class="n">'+d.name+'</div>'+
+      '<div class="hairline"></div></div>'+
+    '<div class="dateline">'+todayStr()+' · 每日 00:00 刷新</div>'+
+    '<div class="prose"><div class="lab">今日推荐</div><p id="dailyPitch">'+d.reason+'</p></div>'+
+    '<div class="priceplain"><b>¥'+d.price+'</b><span>/ 杯</span></div>'+
+    '<button class="cta" data-go="config">选 择 这 款</button>';
+};
+
+T.ai=function(){
+  return '<div class="chatwrap"><div class="chatlist" id="chatlist"></div>'+
+    '<div class="chatinput"><input id="chatinput" placeholder="用你自己的话告诉我想喝什么…"><button id="chatsend">➤</button></div></div>';
+};
+function aiPrevHTML(){
+  return '为你想好啦，这杯就叫「<b>'+ctx.aiName+'</b>」。<div class="aiprev">'+
+    '<div class="pv-img"><div class="genload" id="genload"><span class="typing"><i></i><i></i><i></i></span>'+
+      '<span>AI 正在为你现做这杯…</span></div>'+
+      '<img id="genImg" style="opacity:0" src="'+ctx.aiImg+'" onload="this.style.opacity=1;var l=document.getElementById(\'genload\');if(l)l.style.display=\'none\';" onerror="var l=document.getElementById(\'genload\');if(l){l.querySelector(\'.typing\').style.display=\'none\';l.lastChild.textContent=\'出图服务暂不可用，请稍后再试\';}">'+
+      '</div>'+
+    '<div class="ab"><b>'+ctx.aiName+'</b>'+
+    (ctx.aiLead?'<span class="alead">'+ctx.aiLead+'</span>':"")+
+    '<span class="desc">'+ctx.aiDesc+'</span>'+
+    (ctx.aiWhy?'<div class="ablk"><span class="atag">为什么推荐</span><p class="atxt">'+ctx.aiWhy+'</p></div>':"")+
+    (ctx.aiLayers&&ctx.aiLayers.length?'<div class="ablk"><span class="atag">风味层次</span><ul class="alayers">'+
+      ctx.aiLayers.map(function(l,i){return '<li><i>'+(['初','中','尾'][i]||'•')+'</i><span>'+l+'</span></li>';}).join("")+'</ul></div>':"")+
+    (ctx.aiBenefit?'<div class="ablk"><span class="atag">这杯的好处</span><p class="atxt">'+ctx.aiBenefit+'</p></div>':"")+
+    '<div class="abtns"><button class="breject" id="aiReject">拒 绝</button>'+
+    '<button class="bstart" id="aiStart">开 始</button></div></div></div>';
+}
+
+/* ===== 运行时出图：在 AI 配比页面里，按用户这句话当场生成一张全新的图 =====
+   每次提示词不同 → 生成的图不同；统一加风格后缀保证整体调性一致。 */
+/* 四套参考图风格（与后端编排服务保持一致），按成分自动选景；提示词刻意精简（900字符内遵循度最高） */
+var SCENE_STYLES={
+  milk:"creamy milk tea in a tall clear plastic takeaway cup with matte pale-sage-green silicone cup sleeve, creamy ivory milk at the bottom swirling into caramel-amber tea on top, ice cubes, condensation droplets; warm sage-green and cream background, a slender branch of fresh green maple leaves upper left, dry tea leaves flying above the cup, soft golden morning light",
+  orange:"fresh orange tea in a tall clear plastic takeaway cup filled with vivid bright-orange gradient juice and clear ice, condensation droplets; glowing warm golden-yellow backdrop with soft bokeh, one whole orange and one sliced orange half suspended in the air around the cup, juice droplets sparkling, soft white mist curling around the cup base, rich warm sunlight",
+  fruitLight:"light pale fruit tea in a tall clear plastic cup, translucent pale peach-amber tea with large diamond clear ice cubes, condensation droplets; bright airy pure-white background with crisp diagonal window-blind shadows from morning sun, a thin branch of green leaves upper right, a few dry tea leaves drifting, on the table one curled strip of orange peel as the only prop",
+  tea:"pure clear tea in a tall straight clear plastic cup with a single thin transparent straw, crystal-clear golden-amber tea; clean minimal high-key white background, one slim branch of light-green leaves softly blurred behind the cup, a soft leaf shadow on the white tabletop, airy and serene"
+};
+var HOT_NOTE=", HOT version: no ice cubes, gentle soft white steam rising from the cup opening, cozy warm light";
+var STYLE_TAIL=" Ultra realistic premium beverage photography, vertical 3:4, the drink looks irresistibly delicious. Vessel is ONLY a normal clear plastic takeaway cup or plain glass cup, no bottle, no jar, no can, no bowl, no teapot. REALISTIC LIQUID COLOR: the beverage itself must only be amber tea-brown, creamy ivory milk-white, vivid orange, or pale yellow-citrus; the drink is NEVER green, blue, purple, pink, red or any unnatural color (green cup sleeve, leaves and background are fine, but the liquid must not be green). ABSOLUTELY NO TEXT: no characters, letters, numbers, logo, watermark or print, blank cup only. No people, no flower, no butterfly, no mint, no lemon, no bubbles. ZERO written characters.";
+function sceneStyleOf(ing,temp){
+  var key=ing.milk?"milk":(ing.orange?"orange":(ing.c?"fruitLight":"tea"));
+  return SCENE_STYLES[key]+(temp==="hot"?HOT_NOTE:"");
+}
+/* 中文风味信号 → 英文，只取前2个，避免冲淡关键约束 */
+var FLAVOR_EN=[
+  [/清爽|清新|清冽|解腻|通透|解渴|清凉|凉/,"clean crisp refreshing taste"],
+  [/浓郁|醇厚|丝滑|绵密|奶香|厚乳|顺滑/,"rich silky creamy mouthfeel"],
+  [/橙|橘|桔|鲜橙|香橙/,"bright vivid orange aroma"],
+  [/茶|乌龙|茉莉|红茶|绿茶|回甘|茶香/,"clear tea fragrance with sweet aftertaste"],
+  [/酸|酸甜|维\s*c|vc|c100|水溶|柠檬/,"fresh light fruity acidity"],
+  [/甜|甘|蜜|微甜/,"gentle natural sweetness"],
+  [/温柔|治愈|放松|舒缓/,"gentle soothing flavor"],
+  [/高级|豪华|顶级|精致|优雅|贵|奢/,"refined premium flavor"],
+  [/元气|开心|活力|醒神|提神|醒/,"bright energizing flavor"],
+  [/热|烫|温/,"warm comforting flavor"]
+];
+function flavorEnNote(){
+  var raw=Array.prototype.slice.call(arguments).filter(Boolean).join(" "),out=[];
+  for(var i=0;i<FLAVOR_EN.length;i++){if(FLAVOR_EN[i][0].test(raw)&&out.indexOf(FLAVOR_EN[i][1])<0)out.push(FLAVOR_EN[i][1]);}
+  if(!out.length)out.push("fresh balanced flavor");
+  return "Express this flavor through color and texture only: "+out.slice(0,2).join(", ")+".";
+}
+
+function genImageURL(scenePrompt,seed){
+  var p=scenePrompt.replace(/[，。、]/g," ");
+  return "https://image.pollinations.ai/prompt/"+encodeURIComponent(p)+
+    "?width=768&height=1100&seed="+seed+"&nologo=true&model=turbo";
+}
+function seedOf(t){var h=0;for(var i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))>>>0;return h%100000;}
+
+/* ===== IMGAI：饮品出图，与文本 AI 同步，走统一编排服务(豆包 Seedream) =====
+   未配置后端时用免密钥公共模型兜底（画质有限）；正式部署在 DM_SERVER 指向 Node 编排服务。 */
+var IMGAI={
+  backend:(localStorage.getItem("dm_img_srv")||"").replace(/\/+$/,""),
+  useBackend:function(url){this.backend=(url||"").replace(/\/+$/,"");
+    if(this.backend)localStorage.setItem("dm_img_srv",this.backend);
+    return "出图后端："+(this.backend||"未配置（公共模型兜底）");},
+  configured:function(){return !!this.backend;},
+  generate:function(input){
+    var self=this, pl=Object.assign({size:"768x1024"},input);
+    if(this.backend){
+      return fetch(this.backend+"/api/image/generate",{
+        method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(pl)
+      }).then(function(r){return r.json();}).then(function(j){
+        if(j&&j.url)return j;throw new Error("bad image resp");
+      }).catch(function(){return self._fallback(pl);});
+    }
+    return Promise.resolve(this._fallback(pl));
+  },
+  _fallback:function(pl){
+    var ing=pl.ingredients||{};
+    var p=flavorEnNote(pl.name,pl.desc,pl.mood,pl.temp==="hot"?"热":"冰")+" "+sceneStyleOf(ing,pl.temp)+STYLE_TAIL;
+    return {url:genImageURL(p,pl.seed!=null?pl.seed:Math.floor(Math.random()*1e6)),provider:"pollinations",prompt:p};
+  }
+};
+
+/* ==================================================================
+   TEXTAI —— 饮料机的“高情商文本大脑”（真模型，开箱即用）
+   覆盖所有需要说话的地方：意图/需求判断、饮品起名、高情商产品介绍、
+   闲聊应答、每日推荐文案。
+   · 默认直连 Pollinations 文本接口（免密钥、浏览器可跨域，与文生图同源）
+   · 生产环境可一键换成你自己的后端中转（密钥不出后端，见 server 示例）
+   · 断网 / 超时 / 返回异常 → 自动回退本地规则，原型永远能点
+   ================================================================== */
+var TEXTAI={
+  /* 默认指向自建「文本AI后端」(Kimi K3)。地址优先级：localStorage(dm_text_srv) > 与页面同主机的:8787。
+     后端不可达时 understand() 自动回退本地规则，保证原型离线也能点（理解质量以后端为准）。 */
+  backend:(function(){
+    var saved=(localStorage.getItem("dm_text_srv")||"").replace(/\/+$/,"");
+    if(saved)return saved;
+    try{
+      if(location.protocol==="http:"||location.protocol==="https:"){
+        if(location.port==="8787")return location.origin;
+        return location.protocol+"//"+location.hostname+":8787";
+      }
+    }catch(e){}
+    return "http://localhost:8787";
+  })(),
+  get endpoint(){return this.backend+"/api/text";},
+  model:"kimi-k3",
+  timeout:15000,
+  useSrv:function(url){this.backend=(url||"").replace(/\/+$/,"");
+    if(this.backend)localStorage.setItem("dm_text_srv",this.backend);
+    return "文本后端："+(this.backend||"未配置");},
+  /* 业务背景，注入到每次对话，让 AI 的判断和文案贴合这台机器 */
+  MENU_CTX:"这是一台高端AI现调茶饮机。机器里只有4种原料：①东方树叶(可换乌龙/茉莉/红/绿茶底) ②水溶C100柠檬味 ③100%橙汁 ④纯牛奶，外加冰/水。"+
+    "没有青柠、柠檬片、薄荷、气泡/苏打/汽水、珍珠、椰果、燕麦奶、椰奶、糖、蜂蜜、咖啡、花朵等任何其它东西；也没有气泡技术，顾客要气泡要致歉并改推一杯不带气泡同样清爽的冰饮。"+
+    "可调奶量(无/少/正常/多)、温度(冰/常温/热)。所有形容词都只修饰这杯饮料本身，绝不描写或生成任何人物。招牌约¥14-17，AI定制¥18起。"+
+    "支付为顾客扫店主本人微信收款码转账、备注6位订单码，店主在账本导入微信账单核对后出餐；密码指纹都在微信内完成，本机不接触。",
+  FORBID:["青柠","柠檬片","薄荷","香草","迷迭香","百里香","气泡","苏打","汽水","珍珠","椰果","燕麦","椰奶",
+    "蜂蜜","奶油","奶盖","咖啡","美式","拿铁","玫瑰","樱花","花朵","花瓣","鲜花",
+    "女生","女孩","少女","女人","美女","男生","男孩","男人","人物","人像","模特"],
+  sanitize:function(s){var t=String(s==null?"":s);for(var i=0;i<this.FORBID.length;i++)t=t.split(this.FORBID[i]).join("");
+    return t.replace(/[「」『』"]/g,"").replace(/\s+/g," ").trim();},
+  configured:function(){return /^https?:\/\//i.test(this.endpoint);},
+  /* 指向自建「文本AI后端(Kimi K3)」：TEXTAI.useSrv("https://域名")，地址存 dm_text_srv */
+  useBackend:function(url,model){if(url){this.backend=url.replace(/\/+$/,"");this.endpoint=this.backend+"/api/text";localStorage.setItem("dm_text_srv",this.backend);}if(model)this.model=model;return window.__TEXTAI_STATUS__();},
+  /* 自建后端：POST /api/text {text} → 已校验好的成品 JSON（推荐，Kimi K3 在服务端） */
+  callSrv:function(userText){
+    return new Promise(function(resolve){
+      if(!TEXTAI.backend){resolve(null);return;}
+      var controller=null,timer=null,done=false;
+      function finish(v){if(done)return;done=true;if(timer)clearTimeout(timer);resolve(v);}
+      try{
+        if(window.AbortController)controller=new AbortController();
+        timer=setTimeout(function(){if(controller)try{controller.abort();}catch(e){}finish(null);},TEXTAI.timeout);
+        fetch(TEXTAI.backend+"/api/text",{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({text:userText}),signal:controller?controller.signal:undefined})
+          .then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
+            if(j&&typeof j.order==="boolean")finish(j);else finish(null);
+          }).catch(function(){finish(null);});
+      }catch(e){finish(null);}
+    });
+  },
+  /* 兜底底层：OpenAI 兼容 chat（未配自建后端时用），resolve 纯文本 */
+  chat:function(messages){
+    return new Promise(function(resolve){
+      if(TEXTAI.backend||!TEXTAI.configured()){resolve(null);return;}
+      var controller=null,timer=null,done=false;
+      function finish(v){if(done)return;done=true;if(timer)clearTimeout(timer);resolve(v);}
+      try{
+        if(window.AbortController)controller=new AbortController();
+        timer=setTimeout(function(){if(controller)try{controller.abort();}catch(e){}finish(null);},TEXTAI.timeout);
+        fetch(TEXTAI.endpoint,{
+          method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({model:TEXTAI.model,messages:messages,temperature:.9}),
+          signal:controller?controller.signal:undefined
+        }).then(function(r){if(!r.ok)throw 0;return r.json();})
+          .then(function(j){
+            var txt=j&&j.choices&&j.choices[0]&&j.choices[0].message&&j.choices[0].message.content;
+            finish(txt?String(txt).trim():null);
+          }).catch(function(){finish(null);});
+      }catch(e){finish(null);}
+    });
+  },
+  _parseJSON:function(txt){
+    if(!txt)return null;
+    var m=txt.match(/\{[\s\S]*\}/);
+    if(!m)return null;
+    try{return JSON.parse(m[0]);}catch(e){return null;}
+  },
+  /* 统一把成品规整成 {order,name,desc,reply,apology,mods,ai}；任何文案再过一遍禁用词 */
+  _shape:function(o,userText){
+    var clean=function(s){return TEXTAI.sanitize(s).slice(0,110);};
+    var fizzy=/气泡|苏打|汽水|带气|加气|雪碧|可乐/.test(userText);
+    var apology=clean(o.apology)||(fizzy?"抱歉，这台机器暂时做不了带气泡的饮品，我给你换一杯不加气泡、但一样清爽冰凉的，可以吗？":"");
+    if(o.order===false)return {order:false,name:"",desc:"",reply:clean(o.reply)||"好的，你想喝什么随时告诉我～",apology:"",mods:null,ai:true};
+    var mods=this._normMods(o);
+    return {order:true,name:clean(o.name).replace(/特调/g,"").slice(0,10),
+      desc:clean(o.desc||o.meaning),reply:"",apology:apology,mods:mods,
+      temp:/^(cold|normal|hot)$/.test(o.temp)?o.temp:null,ai:true};
+  },
+  /* 高情商 + 高智商：先问自建 Kimi 后端；不可用再退回免密钥公共模型；都失败返回 null（调用方本地兜底） */
+  understand:function(userText){
+    var self=this;
+    return this.callSrv(userText).then(function(j){
+      if(j)return self._shape(j,userText);
+      /* —— 公共模型兜底：仍把铁律塞进 system prompt —— */
+      var sys="你是这台AI现调茶饮机的对话大脑。"+TEXTAI.MENU_CTX+
+        "只要顾客的话里带有任何对饮品的需求、形容、口味、心情、价格或原料倾向，哪怕一两个字，一律 order=true 照做，不反问。"+
+        "纯打招呼/道谢、纯辱骂与饮品无关、明确问机器用法/价格表/故障才 order=false。"+
+        "只能用东方树叶/水溶C/橙汁/牛奶四种原料，绝不出现青柠、薄荷、气泡、花朵或人物；顾客要气泡要在apology致歉并改推无气泡清爽冰饮。"+
+        "解析字段：milk奶量0-3；temp温度cold/normal/hot；tier档位1-3。只输出JSON："+
+        "{\"order\":true,\"apology\":\"\",\"reply\":\"\",\"name\":\"4-6字饮品名\",\"desc\":\"30-60字风味情绪介绍\","+
+        "\"milk\":null,\"temp\":null,\"tier\":null}";
+      return self.chat([{role:"system",content:sys},{role:"user",content:userText}]).then(function(txt){
+        var o=self._parseJSON(txt);
+        if(!o||typeof o.order!=="boolean")return null;
+        return self._shape(o,userText);
+      }).catch(function(){return null;});
+    });
+  },
+  _lvl:function(v){var n=parseInt(v,10);return (n===0||n===1||n===2||n===3)?n:null;},
+  _normMods:function(o){
+    if(!o||typeof o!=="object")return null;
+    var m={};
+    var milk=this._lvl(o.milk),sugar=this._lvl(o.sugar),tier=this._lvl(o.tier),orange=this._lvl(o.orange);
+    if(milk!==null)m.milk=milk;
+    if(sugar!==null)m.sugar=sugar;
+    if(tier===1||tier===2||tier===3)m.tier=tier;
+    if(/^(cold|normal|hot)$/.test(o.temp))m.temp=o.temp;
+    if(orange!==null)m.extra={orange:orange}; /* 只有"橙汁/橙"这一种真实加料，且不新增其它 */
+    if(typeof o.budget==="number"&&o.budget>0)m.budget=o.budget;
+    else{var b=parseFloat(String(o.budget).replace(/[^\d.]/g,""));if(b>0)m.budget=b;}
+    return Object.keys(m).length?m:null;
+  },
+  /* 每日推荐 / 招牌介绍：优先自建后端 /api/daily，其次公共模型；文案过禁用词，失败 null */
+  pitch:function(name,en,price,hint){
+    var self=this;
+    var clean=function(t){return self.sanitize(t).slice(0,110);};
+    if(this.backend){
+      return new Promise(function(resolve){
+        fetch(self.backend+"/api/daily",{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({name:name,en:en,hint:hint})})
+          .then(function(r){return r.ok?r.json():null;}).then(function(j){
+            resolve(j&&j.text?clean(j.text):null);
+          }).catch(function(){resolve(null);});
+      });
+    }
+    var sys="你是高端茶饮品牌的资深产品文案。"+TEXTAI.MENU_CTX+
+      "请写一句高情商、有画面感、能激发购买欲的推荐，第二人称，40-70字，突出口感层次与适合的心情/场景，不要价格、不要标题，只输出一句话正文，且不出现人物与4种之外的原料。";
+    var user="饮品名："+name+(en?"（"+en+"）":"")+"，参考风味："+(hint||"招牌现调")+"，售价¥"+price+"。";
+    return this.chat([{role:"system",content:sys},{role:"user",content:user}])
+      .then(function(txt){return txt?clean(txt.replace(/^["“]|["”]$/g,"")):null;})
+      .catch(function(){return null;});
+  }
+};
+window.__TEXTAI_STATUS__=function(){return "文本AI："+TEXTAI.model+" @ "+TEXTAI.endpoint+"（默认免密钥直连，可用 TEXTAI.useBackend 切换自建中转；异常自动本地兜底）";};
+
+/* ==================================================================
+   DRINKAI —— 小程序唯一的后台链路：统一「饮料机AI编排服务」
+   小程序只说一句话 → 服务内部一条龙：文本大脑(Kimi K3/可切豆包)起名写文案
+   → 据配方推导4种真实原料 → 豆包 Seedream 出图 → 一次返回全套(含图片URL)。
+   地址优先级：localStorage(dm_drink_srv，兼容旧 dm_text_srv) > 同主机 :8790。
+   服务不可达 / 超时 → resolve(null)，调用方自动退回本地规则，原型离线也能点。
+   ================================================================== */
+/* ===== 历史记录：localStorage 存所有调配过的饮品，支持记录页一键再来 & 对话里召回 ===== */
+var HISTORY={
+  KEY:"dm_history_v1",MAX:60,
+  all:function(){try{return JSON.parse(localStorage.getItem(this.KEY)||"[]");}catch(e){return [];}},
+  save:function(r){
+    var list=this.all();
+    r.id=r.id||("h"+Date.now()+"_"+Math.floor(Math.random()*999));
+    r.ts=Date.now();
+    list.unshift(r);
+    if(list.length>this.MAX)list=list.slice(0,this.MAX);
+    try{localStorage.setItem(this.KEY,JSON.stringify(list));}catch(e){}
+    if(typeof refreshRecBadge==="function")refreshRecBadge();
+    return r;
+  },
+  count:function(){return this.all().length;},
+  get:function(id){return this.all().filter(function(x){return x.id===id;})[0]||null;},
+  remove:function(id){
+    var list=this.all().filter(function(x){return x.id!==id;});
+    localStorage.setItem(this.KEY,JSON.stringify(list));
+    if(typeof refreshRecBadge==="function")refreshRecBadge();
+  },
+  /* 相似度：名字（含错别字容忍）+ 成分描述（奶茶/橙/清茶/维C） */
+  _nameHit:function(rec,q){
+    var n=(rec.name||"").replace(/[「」『』\s·]/g,""),qq=q.replace(/[「」『』\s，。、！？？!?,，.的了吗呢啊我要想来杯一杯那个这个]/g,"");
+    if(!qq)return 0;
+    if(n.indexOf(qq)>=0||qq.indexOf(n)>=0)return 1;
+    /* 逐字命中率，容忍一两个错别字（如 清欢粒→清欢里） */
+    var hit=0;for(var i=0;i<qq.length;i++)if(n.indexOf(qq[i])>=0)hit++;
+    var rate=hit/Math.max(qq.length,n.length);
+    return rate>=0.5?rate:0;
+  },
+  _ingHit:function(rec,q){
+    var ing=rec.ingredients||{},score=0,need=0;
+    var tests=[
+      [/奶|拿铁|牛乳/,!!ing.milk],
+      [/橙|橘|果汁/,!!ing.orange],
+      [/维\s*c|c100|水溶|果味|酸/,!!ing.c],
+      [/清茶|绿茶|乌龙|茉莉|红茶|纯茶/,ing.tea&&!ing.milk&&!ing.orange&&!ing.c]
+    ];
+    for(var i=0;i<tests.length;i++){
+      if(tests[i][0].test(q)){need++;if(tests[i][1])score++;}
+    }
+    return need?score/need:0;
+  },
+  /* 在用户一句话里找历史：返回 {rec, candidates:[...], kind} */
+  detect:function(q){
+    var t=(q||"").toLowerCase(),list=this.all();
+    if(!list.length)return null;
+    /* 时间指代：直接取最近 */
+    if(/上次|上回|前次|刚才|之前|最近|昨天|今天|那杯|那个|再来一?杯|还喝|照旧|老样子|一样的/.test(t)){
+      /* "上次+名字" 先按名字筛 */
+      var byName=this.matchByName(t.replace(/上次|上回|前次|刚才|之前|最近|昨天|今天|那杯|那个|再来一?杯|还喝|照旧|老样子|一样的|的|喝/g," ").trim());
+      var pool=byName.length?byName:list;
+      return {rec:pool[0],candidates:[],kind:"recent"};
+    }
+    /* 点名：精确/模糊名字（但"奶茶/橙汁/清茶"这类通用口味词不算点名，走成分匹配） */
+    var bare=t.split("").filter(function(ch){
+      return "，。、！？？!?,，.「」『』 　的了吗呢啊我要想来杯一个那这给做调喝点甜冰热浓清淡好最上次回前才之近昨天再来还照旧老样子".indexOf(ch)<0;
+    }).join("");
+    var isGeneric=/^(奶茶|牛奶|奶|清茶|红茶|绿茶|乌龙茶|茉莉|橙汁|橙子|果茶|果汁|水果茶|维C|维c|c100|气泡水|可乐|茶|饮品|饮料|好喝的|招牌|最贵|便宜)$/;
+    var mn=isGeneric.test(bare)?[]:this.matchByName(t);
+    if(mn.length){
+      if(mn.length===1)return {rec:mn[0],candidates:[],kind:"name"};
+      return {rec:mn[0],candidates:mn.slice(0,3),kind:"guess"};
+    }
+    /* 成分描述 */
+    var scored=list.map(function(rec){return {rec:rec,s:HISTORY._ingHit(rec,t)};}).filter(function(x){return x.s>=0.66;}).sort(function(a,b){return b.s-a.s;});
+    if(scored.length===1)return {rec:scored[0].rec,candidates:[],kind:"ingredient"};
+    if(scored.length>1){
+      var top=scored[0].s,ties=scored.filter(function(x){return x.s===top;}).map(function(x){return x.rec;});
+      return {rec:ties[0],candidates:ties.slice(0,3),kind:"guess"};
+    }
+    return null;
+  },
+  matchByName:function(t){
+    var self=this;
+    return self.all().map(function(rec){return {rec:rec,s:self._nameHit(rec,t)};})
+      .filter(function(x){return x.s>0;}).sort(function(a,b){return b.s-a.s;}).map(function(x){return x.rec;});
+  }
+};
+function refreshRecBadge(){
+  var n=document.getElementById("navRecN");
+  if(n)n.textContent=HISTORY.count()>99?"99+":HISTORY.count();
+}
+
+var DRINKAI={
+  backend:(function(){
+    var saved=(localStorage.getItem("dm_drink_srv")||localStorage.getItem("dm_text_srv")||"").replace(/\/+$/,"");
+    if(saved)return saved;
+    try{
+      if(location.protocol==="http:"||location.protocol==="https:"){
+        if(location.port==="8790")return location.origin;
+        return location.protocol+"//"+location.hostname+":8790";
+      }
+    }catch(e){}
+    return "http://localhost:8790";
+  })(),
+  timeout:30000,   /* 端到端含出图，给足时间 */
+  get endpoint(){return this.backend+"/api/drink";},
+  useSrv:function(url){this.backend=(url||"").replace(/\/+$/,"");
+    if(this.backend)localStorage.setItem("dm_drink_srv",this.backend);
+    return "编排服务："+(this.backend||"未配置");},
+  /* 一句话 → 全套成品；失败 resolve(null) */
+  order:function(userText){
+    return new Promise(function(resolve){
+      if(!DRINKAI.backend){resolve(null);return;}
+      var controller=null,timer=null,done=false;
+      function finish(v){if(done)return;done=true;if(timer)clearTimeout(timer);resolve(v);}
+      try{
+        if(window.AbortController)controller=new AbortController();
+        timer=setTimeout(function(){if(controller)try{controller.abort();}catch(e){}finish(null);},DRINKAI.timeout);
+        fetch(DRINKAI.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({text:userText}),signal:controller?controller.signal:undefined})
+          .then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(j){
+            if(j&&typeof j.order==="boolean")finish(j);else finish(null);
+          }).catch(function(){finish(null);});
+      }catch(e){finish(null);}
+    });
+  },
+  /* 把服务返回规整成前端直接可用的对象；文案再过一遍禁用词，绝不把脏字带上屏 */
+  shape:function(d,userText){
+    var clean=function(s){return TEXTAI.sanitize(s).slice(0,110);};
+    if(d.order===false){
+      return {order:false,reply:clean(d.reply)||"好的，你想喝什么随时告诉我～",ai:true};
+    }
+    var ing=d.ingredients||{};
+    var mods={};
+    /* 以服务据配方推导出的真实原料为准：奶量 / 橙汁只放真实存在的两种 */
+    if(ing.milk===false)mods.milk=0;
+    if(ing.orange===false)mods.orange=0; else if(ing.orange===true)mods.orange=2;
+    var temp=/^(cold|normal|hot)$/.test(d.temp)?d.temp:null;
+    if(temp)mods.temp=temp;
+    /* 诗意长文案：优先 meaning/why，拼出一句有质感的介绍（屏幕只放得下精简版） */
+    var desc=clean(d.desc||d.meaning)||"";
+    return {
+      order:true,
+      name:clean(d.name).replace(/特调/g,"").slice(0,10),
+      desc:desc,
+      lead:clean(d.lead),meaning:clean(d.meaning),why:clean(d.why),
+      layers:Array.isArray(d.layers)?d.layers.map(clean):[],benefit:clean(d.benefit),
+      price:(typeof d.price==="number"&&d.price>0)?d.price:null,
+      recipe:Array.isArray(d.recipe)?d.recipe:[],
+      temp:temp,
+      apology:clean(d.apology),
+      ingredients:ing,
+      image:(d.image&&d.image.url)?d.image:null,
+      mods:Object.keys(mods).length?mods:null,
+      textEngine:d.textEngine||"",textProvider:d.textProvider||"",degraded:!!(d.image&&d.image.degraded),
+      ai:true
+    };
+  }
+};
+window.__DRINKAI_STATUS__=function(){return "编排服务 @ "+DRINKAI.endpoint+"（一句话→特调+豆包出图一条龙；异常自动本地兜底）";};
+
+/* ===== 意图判断（本地兜底）：默认就按顾客说的生成，只拦纯打招呼/道谢/故障/问价表 =====
+   设计原则：不挑顾客措辞，只要带一点对饮品的需求/形容/心情/价格/原料倾向就出单。 */
+function detectIntent(t){
+  /* 仅这些“纯社交 / 纯系统”场景才不出单 */
+  if(/^(你好|您好|嗨|哈喽|hello|hi|在吗|在不在|喂)[\s!！.。~]*$/i.test(t))return {order:false,reply:chatReply(t)};
+  if(/^(谢谢|谢啦|感谢|多谢|thanks|thank you)[\s!！.。~]*$/i.test(t))return {order:false,reply:chatReply(t)};
+  if(/^(哈哈+|呵呵+|233+|666+)[\s!！.。~]*$/.test(t))return {order:false,reply:chatReply(t)};
+  if(/坏了|故障|不能用|不出饮料|不出杯|卡住了|维修/.test(t))return {order:false,reply:chatReply(t)};
+  /* 纯辱骂/抬杠，且全句没有任何对饮品的需求或形容 → 高情商化解，不出单 */
+  var insult=/傻|蠢|笨|有病|神经病|智障|白痴|垃圾|废物|滚|脑残|有病吧|脑子/.test(t);
+  var anyDrinkCue=/喝|奶茶|咖啡|茶|奶|糖|冰|热|气泡|甜|清爽|浓郁|解渴|提神|口味|口感|来|要|给|整|搞|安排|推荐|渴|杯|贵|便宜|好喝|心情|困|累|丧|烦/.test(t);
+  if(insult && !anyDrinkCue)return {order:false,reply:chatReply(t)};
+  /* 明确询问“价格表/多少钱”，且全程没有任何对饮品的形容或点单意思，才只报价 */
+  if(/多少钱|价格表|怎么收费|价位表|菜单价/.test(t) && !/要|来|给我|整|搞|安排|推荐|最贵|最好|便宜|好喝|口感|口味|心情|奶|茶|咖啡|甜|冰|热|气泡/.test(t))
+    return {order:false,reply:chatReply(t)};
+  /* 其余一律按点单处理：哪怕只有“最贵的不要奶”“随便”“整点好喝的” */
+  return {order:true};
+}
+/* 本地解析顾客的具体需求（断网兜底用）；返回与模型 mods 同构的对象 */
+function parseMods(t){
+  var m={};
+  /* 档位：最贵 / 顶级 → 3；便宜 / 划算 → 1 */
+  if(/最贵|顶级|最好|豪华|顶配|高端|不差钱|来个贵|要好的|贵一点/.test(t))m.tier=3;
+  else if(/最便宜|便宜点|便宜的|划算|实惠|平价|省钱/.test(t))m.tier=1;
+  /* 奶量：明确不要奶 → 0；多奶/少奶 */
+  if(/不要奶|不加奶|去奶|无奶|别放奶|不放奶|不要加奶|没奶/.test(t))m.milk=0;
+  else if(/多奶|奶多|加多点奶|双倍奶/.test(t))m.milk=3;
+  else if(/少奶|奶少|少放点奶/.test(t))m.milk=1;
+  /* 机器只有纯牛奶，不提供燕麦/椰/豆奶（识别到也不外放其它奶种，统一纯牛奶） */
+  /* 糖 */
+  if(/无糖|不要糖|不加糖|去糖|零卡/.test(t))m.sugar=0;
+  else if(/少糖|低糖|微糖|三分|不.*甜|别太甜/.test(t))m.sugar=1;
+  else if(/多糖|甜一点|多加糖|全糖/.test(t))m.sugar=3;
+  /* 温度 */
+  if(/热饮|热的|要热|来杯热|加热|烫|暖/.test(t))m.temp="hot";
+  else if(/常温|不冰|不要冰/.test(t))m.temp="normal";
+  else if(/冰|冷|凉|冰镇|冰爽/.test(t))m.temp="cold";
+  /* 机器没有珍珠/椰果；AI 只能调配真实存在的橙汁份量 */
+  if(/不要橙|不加橙|去橙|无橙|不要.*橙汁/.test(t))m.orange=0;
+  else if(/多.*橙|橙.*多|加橙/.test(t))m.orange=3;
+  /* 具体预算 */
+  var b=parseBudget(t);if(b!=null)m.budget=b;
+  return Object.keys(m).length?m:null;
+}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)];}
+function chatReply(t){
+  if(/为什么.*慢|怎么.*慢|太慢|等好久|还没好|多久/.test(t))
+    return pick([
+      "抱歉让你久等啦～现配现做一般一两分钟就好，要不要先说说想喝什么口味？",
+      "马上就好，别着急。你也可以先告诉我口味，我这就给你排上。"]);
+  if(/多少钱|价格|收费|贵不贵/.test(t))
+    return pick([
+      "招牌四款 ¥14～17，AI 定制 ¥18 起，加价项下单前都会写清楚。想先来哪杯？",
+      "价格很透明：¥14 起，加料另算、明码标价。报个口味或预算，我帮你配。"]);
+  if(/你是谁|你会|你能|怎么用|怎么点|可以吗|行不行/.test(t))
+    return "我是你的专属饮品师，你说口味甚至说心情，我都能为你现调一杯。比如“心情不好，想喝点甜的”。";
+  if(/谢谢|谢啦|感谢/.test(t))return pick(["不客气～想喝随时叫我。","应该的，记得渴了就来找我。"]);
+  if(/你好|在吗|嗨|哈喽|喂/.test(t))return pick(["嗨～在的，今天想喝点什么？","你好呀，说说现在的心情或口味吧。"]);
+  if(/坏了|故障|不出|不能用/.test(t))return "我帮你看看～也可以联系现场工作人员。要不要先说一遍想喝的口味？";
+  if(/哈哈|有意思|好玩/.test(t))return pick(["嘿嘿～要不要认真来一杯？报口味就行。","笑完记得喝水哦，想喝什么告诉我。"]);
+  if(/傻|蠢|笨|有病|神经病|智障|白痴|垃圾|废物|滚|脑残|脑子/.test(t))
+    return pick([
+      "哎呀，是我没服务好～别气别气，你想喝什么我马上用心做一杯赔罪。",
+      "我的错我的错🙏 给我个补救机会吧，说个口味，我这就给你调好。"]);
+  return pick([
+    "在的，你想喝点什么都行——口味、心情、预算，甚至只说‘随便来杯好喝的’，我马上给你配一杯。",
+    "怎么说我都能接住～给我个方向就行，清爽的、浓郁的、贵的便宜的、要奶不要奶，都可以。"]);
+}
+
+/* 从用户这句话里解析预算：如“要99的”“不低于50”“一百块” */
+function parseBudget(t){
+  var cn={一:1,二:2,两:2,三:3,四:4,五:5,六:6,七:7,八:8,九:9,十:10};
+  var m=t.match(/(\d+(?:\.\d+)?)\s*(?:块|元|rmb|￥|¥)/i);
+  var val=null;
+  if(m)val=parseFloat(m[1]);
+  else{
+    var mm=t.match(/([一二两三四五六七八九十百零]+)\s*[块元]/);
+    if(mm){var s=mm[1],num=0,sec=0;
+      for(var i=0;i<s.length;i++){var ch=s[i];
+        if(ch==="百"){sec+=(num||1)*100;num=0;}
+        else if(ch==="十"){sec+=(num||1)*10;num=0;}
+        else if(ch==="零"){}
+        else num=cn[ch]||0;}
+      val=sec+num;}
+  }
+  if(val!=null && val>=1)return val;
+  /* “不低于99 / 至少99 / 99以上” */
+  return null;
+}
+
+/* 根据用户这句话：识别口味或情绪 → 生成专属画面描述 + 当场出图
+   铁律：画面里只能有这杯饮料，原料只有 东方树叶/水溶C/橙汁/牛奶 + 冰/水；
+   绝不出现人物、青柠、薄荷、香草、花朵、咖啡豆、珍珠，也不画气泡（机器没有气泡技术）。 */
+function classify(t){
+  var seed=seedOf(t+Date.now()%100000);
+  function img(extra,sceneKey,ing){ing=ing||{};sceneKey=sceneKey||"fruitLight";
+    return genImageURL("Express this flavor through color and texture only: "+extra+". "+(SCENE_STYLES[sceneKey]||SCENE_STYLES.fruitLight)+STYLE_TAIL,seed);}
+  /* —— 情绪 / 场景 —— */
+  if(/心情不好|难过|不开心|郁闷|丧|想哭|emo|烦|焦虑|安慰|治愈|犒劳|奖励自己|开心一下|幸福|甜蜜/.test(t))
+    return {type:"moodWarm",temp:"cold",
+      img:img("a comforting soothing drink, warm peachy orange tea blended with silky milk, soft creamy caramel swirl, "+
+        "clear ice, gentle warm pastel peach and beige tones, tender healing mood","milk"),
+      desc:"给你一杯温柔的安慰：暖橙茶汤兑入丝滑牛奶，入口绵密甘甜，像被轻轻拍了拍，心情会慢慢好起来。"};
+  if(/开心|高兴|庆祝|约会|聚会|好心情/.test(t))
+    return {type:"moodHappy",temp:"cold",
+      img:img("a joyful bright drink, golden orange tea layered with fresh orange juice, clear ice cubes, "+
+        "a curled orange peel twist on the rim, cheerful warm sunlight, airy festive warm tones","orange"),
+      desc:"为好心情干杯：橙香明亮、茶汤清爽，冰爽又不腻口，把开心的味道再放大一点。"};
+  if(/累|疲惫|放松|压力大|摸鱼/.test(t))
+    return {type:"moodRelax",temp:"hot",
+      img:img("a calming relaxing hot milk tea, soft warm caramel and milky tones, gentle white steam rising, cozy warm beige, restful and quiet","milk"),
+      desc:"辛苦了，这杯帮你松一松：温润奶茶不抢味，热气慢慢腾起，喝一口让肩膀和心情都放下来。"};
+  if(/困|犯困|熬夜|加班|提神|醒神/.test(t))
+    return {type:"hot",temp:"hot",
+      img:img("a warm hot amber Chinese tea, deep golden reddish-brown clear tea, visible rising white steam, "+
+        "a curled orange peel twist on the rim, cozy and gently energizing","tea"),
+      desc:"熬夜犯困就靠它：热茶汤醇厚回甘，热气唤醒精神，又不刺激，陪你把状态拉回来。"};
+  /* —— 口味 —— */
+  if(/热|暖/.test(t))
+    return {type:"hot",temp:"hot",
+      img:img("a warm hot amber Chinese tea, deep golden clear tea, gentle white steam curling above the cup, a curled orange peel twist, cozy","tea"),
+      desc:"热饮温润回甘，杯口热气缓缓升起，适合需要被唤醒或取暖的时候。"};
+  /* 想要气泡：机器做不了，文案由文本AI致歉，这里给一杯同样清爽、不带气泡的冰橙茶 */
+  if(/气泡|苏打|汽水|清爽|柠|青柠|薄荷|冰爽|解腻/.test(t))
+    return {type:"clear",temp:"cold",
+      img:img("a refreshing still iced drink, crystal-clear pale golden blend of Chinese tea and fresh orange juice, "+
+        "clear ice cubes, a curled orange peel twist, bright crisp and clean, no fizz, cold and thirst-quenching","fruitLight"),
+      desc:"清透冰爽的橙香茶饮，冰凉通透、解腻解渴，虽然没有气泡，一样一口回神、元气满满。"};
+  if(/不.*甜|无糖|少糖|清淡|不甜|简单|干净/.test(t))
+    return {type:"light",temp:"cold",
+      img:img("a very light clear pale golden Chinese tea, crystal clear, restrained, only a few ice cubes, "+
+        "a curled orange peel twist, minimal and calm, lots of negative space","tea"),
+      desc:"茶汤清澈克制，茶香轻盈、几乎无负担，安静地润一润就很舒服。"};
+  if(/奶|拿铁|醇厚|丝滑|浓郁|奶香/.test(t))
+    return {type:"milk",temp:"cold",
+      img:img("a rich creamy milk tea, milky white and light caramel swirls in clear amber tea, silky milk texture, clear ice, indulgent","milk"),
+      desc:"奶香与红茶香温柔交融，入口丝滑绵密、回甘干净，是一杯很有满足感的醇厚奶茶。"};
+  return {type:"default",temp:"cold",
+    img:img("a custom layered orange tea, amber golden gradient from clear tea to bright orange, clear ice, balanced and elegant","fruitLight"),
+    desc:"风味层次已经按你说的调好：茶香、果香与冰感各就各位，先看看这杯的样子，满意就开始调配吧。"};
+}
+
+function recSub(r){
+  var ing=r.ingredients||{},parts=[];
+  if(ing.milk)parts.push("奶茶");
+  if(ing.orange)parts.push("橙汁");
+  if(ing.c)parts.push("维C果茶");
+  if(!parts.length)parts.push("清茶");
+  parts.push(r.temp==="hot"?"热饮":(r.temp==="normal"?"常温":"冰饮"));
+  if(r.ice&&r.ice!=="正常冰"&&r.ice!=="热饮无冰")parts.push(r.ice);
+  if(r.sugar&&r.sugar!=="标准糖")parts.push(r.sugar);
+  return parts.join(" · ");
+}
+function recTime(ts){
+  var d=new Date(ts),now=new Date(),pad=function(n){return n<10?"0"+n:""+n;};
+  var sameDay=d.toDateString()===now.toDateString();
+  var yest=new Date(now);yest.setDate(now.getDate()-1);
+  var isYest=d.toDateString()===yest.toDateString();
+  var hm=pad(d.getHours())+":"+pad(d.getMinutes());
+  if(sameDay)return "今天 "+hm;
+  if(isYest)return "昨天 "+hm;
+  return (d.getMonth()+1)+"月"+d.getDate()+"日 "+hm;
+}
+T.history=function(){
+  var list=HISTORY.all();
+  if(!list.length){
+    return '<div class="reclist"><div class="recempty"><span class="big">🍵</span>'+
+      '还没有调配记录<br>去「AI 配比」说句话，调出第一杯属于你的饮品吧</div></div>';
+  }
+  return '<div class="reclist">'+list.map(function(r){
+    var img=r.image||"";
+    return '<div class="reccard" data-hid="'+r.id+'">'+
+      (img?'<img class="rcimg" src="'+img+'" onerror="this.style.visibility=\'hidden\'">':'<div class="rcimg"></div>')+
+      '<div class="rcinfo"><div class="rcname">'+esc(r.name)+'</div>'+
+      '<div class="rcsub">'+esc(recSub(r))+'</div>'+
+      '<div class="rcdate">'+recTime(r.ts)+'</div></div>'+
+      '<div class="rcprice">¥'+r.price+'</div><div style="font-size:18px;color:#9aa096">›</div></div>';
+  }).join("")+'</div>';
+};
+
+T.select=function(){
+  var sorted=DRINKS.slice().sort(function(a,b){return a.ord-b.ord;});
+  return '<div class="ghead"><div class="pt">四 款 招 牌</div><div class="pe">点击任意一款进入调配</div></div>'+
+    '<div class="grid2">'+sorted.map(function(d){
+      return '<div class="gitem" data-drink="'+d.id+'"><div class="gimg"><img src="'+imgOf(d)+'"></div>'+
+        '<div class="gname">'+d.name+'</div><div class="gprice">¥'+d.price+'</div></div>';
+    }).join('')+'</div>';
+};
+
+T.config=function(){
+  var d=drinkById(ctx.drinkId);
+  var showName=ctx.isAI?ctx.aiName:d.name;
+  return '<div class="conf">'+
+    '<div class="stage" style="height:268px;--travel:255px">'+
+      '<img src="'+(ctx.isAI?ctx.aiImg:imgOf(d))+'">'+
+      (ctx.isAI&&ctx.aiType==="hot"?"":bubblesHTML(14))+
+      '<div class="haze soft" style="bottom:-40px;height:120px"></div></div>'+
+    '<div class="titleblock" style="margin-top:-26px"><div class="n" style="font-size:27px">'+showName+'</div></div>'+
+    '<div class="cgroup"><div class="clab">加 多 少 奶</div><div class="seg seg4" data-g="milk">'+
+      '<button data-v="0"><span class="sic">'+MILKICON[0]+'</span>无奶</button>'+
+      '<button data-v="1"><span class="sic">'+MILKICON[1]+'</span>少奶</button>'+
+      '<button data-v="2" class="on"><span class="sic">'+MILKICON[2]+'</span>正常</button>'+
+      '<button data-v="3"><span class="sic">'+MILKICON[3]+'</span>多奶</button></div>'+
+      '<div class="clab" style="margin-top:13px">奶 的 种 类</div><div class="seg seg4" data-g="mtype">'+
+        mkMtypeBtns("cow")+
+      '</div></div>'+
+    '<div class="cgroup"><div class="clab">加 多 少 糖</div><div class="seg seg4" data-g="sugar">'+
+      '<button data-v="0"><span class="sic">'+SUGARICON[0]+'</span>无糖</button>'+
+      '<button data-v="1"><span class="sic">'+SUGARICON[1]+'</span>少糖</button>'+
+      '<button data-v="2" class="on"><span class="sic">'+SUGARICON[2]+'</span>正常</button>'+
+      '<button data-v="3"><span class="sic">'+SUGARICON[3]+'</span>多糖</button></div></div>'+
+    '<div class="cgroup"><div class="clab">配 料 份 量 <span class="multi">（每种可选不要 / 少 / 正常 / 多）</span></div>'+
+      mkToppGroup("pearl","🧋")+
+      mkToppGroup("coconut","🥥")+
+      mkToppGroup("orange","🍊")+
+    '</div>'+
+    '<div class="cgroup"><div class="clab">温 度</div><div class="seg" data-g="temp">'+
+      '<button data-v="cold" class="'+(cst.temp==="cold"?"on":"")+'">冰</button>'+
+      '<button data-v="normal" class="'+(cst.temp==="normal"?"on":"")+'">常温</button>'+
+      '<button data-v="hot" class="'+(cst.temp==="hot"?"on":"")+'">热</button></div></div>'+
+    '<div id="sumWrap">'+summaryHTML()+'</div>'+
+    '<button class="cta" id="toPay">去 付 款</button></div>';
+};
+function mkMtypeBtns(cur){
+  return Object.keys(MILKTYPES).map(function(k){
+    var m=MILKTYPES[k];
+    return '<button data-v="'+k+'" class="'+(cur===k?"on":"")+'">'+m.name+
+      (m.d?' <i class="mtag">+'+m.d+'</i>':'')+'</button>';
+  }).join('');
+}
+function mkToppGroup(key,emoji){
+  var v=cst.extra[key],t=TOPP[key];
+  return '<div class="topprow"><div class="toppname">'+emoji+' '+t.name+'</div>'+
+    '<div class="seg seg4 toppseg" data-tg="'+key+'">'+
+      [0,1,2,3].map(function(q){
+        return '<button data-v="'+q+'" class="'+(v===q?"on":"")+'">'+LNAME[q]+'</button>';
+      }).join('')+
+    '</div></div>';
+}
+
+/* milk：奶量0-3；mtype：奶种 cow牛奶/oat燕麦奶/coco椰奶/soy豆奶；
+   extra：每种配料份量 0不要 1少 2正常 3多 */
+var cst={milk:2,mtype:"cow",sugar:2,extra:{pearl:0,coconut:0,orange:2},temp:"cold"};
+var LNAME=["无","少","正常","多"];
+var MILKTYPES={
+  cow:{name:"牛奶",d:0,cost:.8},
+  oat:{name:"燕麦奶",d:2,cost:1.6},
+  coco:{name:"椰奶",d:2,cost:1.5},
+  soy:{name:"豆奶",d:1,cost:1.0}
+};
+/* 配料：售价系数(每份 delta = 单价*份量系数) 与 单位原料成本(按正常份) */
+var TOPP={
+  pearl:{name:"珍珠",basePrice:2,baseCost:.7},
+  coconut:{name:"椰果",basePrice:2,baseCost:.6},
+  orange:{name:"新鲜橙片",basePrice:1,baseCost:.5}
+};
+var TOPP_Q=[0,.6,1,1.5];            // 份量对应价格系数
+var TOPP_COST_Q=[0,.6,1,1.45];      // 份量对应成本系数
+function deltaText(v){if(v>0)return '<i class="plus">+¥'+v+'</i>';if(v<0)return '<i class="minus">-¥'+(-v)+'</i>';return '<i class="zero">¥0</i>';}
+
+/* ===== 成本模型（市场采购价口径的原料成本） =====
+   不同饮品基础成本不同，再叠加奶/糖/配料 */
+var BASECOST={d1:5.2,d2:4.6,feng:4.3,rou:5.6};
+function calcPrice(){
+  var s=cst;
+  var base=ctx.isAI?ctx.aiPrice:drinkById(ctx.drinkId).price;
+  var dMilk=(s.milk===3?2:s.milk===0?-1:0);
+  var dSugar=(s.sugar===3?1:0);
+  var dMtype=MILKTYPES[s.mtype].d;
+  var dTop=0,dItems=[];
+  Object.keys(TOPP).forEach(function(k){
+    var d=Math.round(TOPP[k].basePrice*TOPP_Q[s.extra[k]]*100)/100;
+    dTop=Math.round((dTop+d)*100)/100;
+    if(s.extra[k]>0)dItems.push(TOPP[k].name+LNAME[s.extra[k]]);
+  });
+  /* 用户主动选择的加料/规格：独立计价，永远叠加，不受目标价/档位影响 */
+  var addOns=Math.round((dMilk+dSugar+dMtype+dTop)*100)/100;
+  /* 基础那杯：只含起价与档位；目标预算只作用于基础杯，不抵扣任何加料 */
+  var tierUp=0,tierLabel="";
+  if(ctx.aiTier===3){tierUp=14;tierLabel="顶级尊享";}
+  else if(ctx.aiTier===1){tierUp=-4;tierLabel="高性价比";}
+  var core=Math.round((base+tierUp)*100)/100;
+  var premium=0;
+  if(ctx.targetBudget && ctx.targetBudget>core){
+    premium=Math.round((ctx.targetBudget-core)*100)/100;  /* 把“基础那杯”顶到预算，加料另算 */
+  }
+  var total=Math.round((core+premium+addOns)*100)/100;
+  if(total<8){var adj=Math.round((8-total)*100)/100;tierUp=Math.round((tierUp+adj)*100)/100;core=Math.round((core+adj)*100)/100;total=Math.round((core+premium+addOns)*100)/100;}  /* 守地板价，但不动加料 */
+  return {base:base,dMilk:dMilk,dSugar:dSugar,dMtype:dMtype,dTop:dTop,addOns:addOns,
+    subtotal:Math.round((base+addOns)*100)/100,tierUp:tierUp,tierLabel:tierLabel,premium:premium,total:total,dItems:dItems};
+}
+function calcCost(){
+  var s=cst;
+  /* AI 定制单同样有茶汤/果汁基底成本（按招牌均价档计 5.0），不能为 0，
+     否则会出现“卖一杯净利等于售价”的错误 */
+  var base=ctx.isAI?5.0:(BASECOST[ctx.drinkId]!=null?BASECOST[ctx.drinkId]:5);
+  var cMilk=(s.milk===3?.6:s.milk===1?-.2:s.milk===0?-.5:0);
+  var cMtype=Math.round((MILKTYPES[s.mtype].cost-MILKTYPES.cow.cost)*100)/100;
+  var cSugar=(s.sugar===3?.15:0);
+  var cTop=0;
+  Object.keys(TOPP).forEach(function(k){
+    cTop+=TOPP[k].baseCost*TOPP_COST_Q[s.extra[k]];
+  });
+  var overhead=1.2;   // 杯/吸管/封口/水电分摊
+  var cTier=ctx.aiTier===3?5.0:ctx.aiTier===1?-0.8:0;  /* 顶级档用优选原料，平价档省料 */
+  var c=Math.round((base+cMilk+cMtype+cSugar+cTop+overhead+cTier)*100)/100;
+  return Math.max(c,0);
+}
+function summaryHTML(){
+  var s=cst,p=calcPrice();
+  ctx.lastPrice=p.total;
+  function row(l,v){return '<div class="srow"><span>'+l+'</span><span>'+v+'</span></div>';}
+  var baseName=ctx.isAI?ctx.aiName:drinkById(ctx.drinkId).name;
+  var h='<div class="summary">'+
+    row("「"+baseName+"」起价",'<b class="basep">¥'+p.base+'</b>')+
+    row(LNAME[s.milk]+"奶",deltaText(p.dMilk))+
+    row(MILKTYPES[s.mtype].name,(p.dMtype?'<i class="plus">+¥'+p.dMtype+'</i>':'<i class="zero">¥0</i>'))+
+    row(LNAME[s.sugar]+"糖",deltaText(p.dSugar))+
+    row("珍珠："+LNAME[s.extra.pearl],deltaText(
+      Math.round(TOPP.pearl.basePrice*TOPP_Q[s.extra.pearl]*100)/100))+
+    row("椰果："+LNAME[s.extra.coconut],deltaText(
+      Math.round(TOPP.coconut.basePrice*TOPP_Q[s.extra.coconut]*100)/100))+
+    row("新鲜橙片："+LNAME[s.extra.orange],deltaText(
+      Math.round(TOPP.orange.basePrice*TOPP_Q[s.extra.orange]*100)/100))+
+    row("温度："+({cold:"冰",normal:"常温",hot:"热"})[s.temp],deltaText(0));
+  if(p.tierUp!==0)h+=row(p.tierLabel==="顶级尊享"?"顶级尊享（按你要的最贵档，优选原料）":"高性价比档",deltaText(p.tierUp));
+  if(p.premium>0)h+=row("定制溢价（基础那杯按预算 ¥"+ctx.targetBudget+"，加料另计）",deltaText(p.premium));
+  h+='<div class="stotal"><span>合 计</span><b>¥'+p.total+'</b></div></div>';
+  return h;
+}
+function refreshSum(){var w=document.getElementById("sumWrap");if(w)w.innerHTML=summaryHTML();}
+
+var PAYICON={
+  wechat:'<svg width="22" height="22" viewBox="0 0 24 24"><path d="M9.4 4C5.6 4 3 6.7 3 9.9c0 1.8 1 3.4 2.5 4.4l-.6 1.9 2.2-1.1c.7.2 1.4.3 2.2.3h.5a5.6 5.6 0 0 1-.2-1.5c0-3.1 2.8-5.5 6.3-5.5h.5C15.9 5.7 12.9 4 9.4 4z" fill="#22a35b"/><circle cx="7.2" cy="8.8" r=".8" fill="#fff"/><circle cx="11.3" cy="8.8" r=".8" fill="#fff"/><path d="M21 14.2c0-2.5-2.4-4.5-5.3-4.5S10.4 11.7 10.4 14.2s2.4 4.5 5.3 4.5c.6 0 1.2-.1 1.8-.3l1.8.9-.5-1.6c1.4-.9 2.2-2.2 2.2-3.5z" fill="#2fae63"/><circle cx="14.2" cy="14" r=".65" fill="#fff"/><circle cx="17.2" cy="14" r=".65" fill="#fff"/></svg>'
+};
+/* 收款方是店主本人微信号（个人收款码）。顾客扫码转账给店主，并填 6 位订单码；
+   店主在「饮料机账本」导入微信账单 CSV 自动核对记账。个人收款码无官方到账回调，
+   这里不伪造支付成功；只有店主核对到账后机器才会确认出餐。 */
+var OWNER_WXID="wxid_auf9zvuxskml22";
+var ORDKEY="drink_machine_orders_v1";
+var QRKEY="drink_machine_owner_qr";
+function maskWxid(s){return s&&s.length>10?s.slice(0,8)+"…"+s.slice(-2):s;}
+function genOrderCode(){
+  for(var i=0;i<50;i++){
+    var c=String(Math.floor(100000+Math.random()*900000));
+    var dup=loadOrders().some(function(o){return o.code===c&&o.status!=="paid";});
+    if(!dup)return c;
+  }
+  return String(Date.now()).slice(-6);
+}
+function loadOrders(){try{return JSON.parse(localStorage.getItem(ORDKEY)||"[]");}catch(e){return [];}}
+function saveOrders(a){try{localStorage.setItem(ORDKEY,JSON.stringify(a));}catch(e){}}
+function ownerQr(){try{return localStorage.getItem(QRKEY)||"";}catch(e){return "";}}
+/* 同一杯同金额、10 分钟内未核对的订单复用，避免重复进支付页生成一堆单 */
+function ensureOrder(amount,itemName,cost){
+  var now=Date.now(),ords=loadOrders();
+  var hit=ords.filter(function(o){
+    return o.status!=="paid"&&Math.abs(o.amount-amount)<0.005&&o.item===itemName&&now-o.ts<10*60*1000;
+  }).sort(function(a,b){return b.ts-a.ts;})[0];
+  if(hit)return hit;
+  var o={orderId:"YL"+now+"_"+Math.random().toString(36).slice(2,6),
+    code:genOrderCode(),amount:amount,cost:cost,item:itemName,ts:now,status:"pending"};
+  ords.push(o);saveOrders(ords);return o;
+}
+
+T.pay=function(){
+  var amount=ctx.lastPrice||drinkById(ctx.drinkId).price;
+  return '<div class="cashier">'+
+    '<div class="cashier-top">'+
+      '<div class="cashier-payee">向店主微信付款 · 本机 A08</div>'+
+      '<div class="cashier-amount"><small>¥</small>'+amount+'</div></div>'+
+    '<div class="cashier-body">'+
+      '<div class="cashier-row"><span>商品</span><span>'+(ctx.isAI?ctx.aiName:drinkById(ctx.drinkId).name)+'</span></div>'+
+      '<div class="cashier-row"><span>收款微信</span><span style="font-variant-numeric:tabular-nums">'+maskWxid(OWNER_WXID)+'</span></div>'+
+      '<div class="cashier-row"><span>支付方式</span><span><span class="pmi">'+PAYICON.wechat+'</span> 微信（扫店主收款码）</span></div>'+
+    '</div>'+
+    '<button class="cashier-paybtn" id="payPrimary">立即支付 ¥'+amount+'</button>'+
+    '<div class="cashier-vnote">付款直接进入<b>店主本人微信</b>；指纹 / 面容 / 支付密码都在微信内完成，本小程序不接触</div>'+
+    /* 收款弹层：展示店主个人收款码 + 6 位订单码，顾客转账后等待店主核对 */
+    '<div class="wxoverlay" id="wxOverlay">'+
+      '<div class="wxcard" id="wxCard">'+
+        '<div class="wxbrand">'+PAYICON.wechat+' 微信收款</div>'+
+        '<div class="wxamount"><small>¥</small><span id="wxAmount">'+amount+'</span></div>'+
+        '<div class="wxpayee">收款方：店主本人 '+maskWxid(OWNER_WXID)+'</div>'+
+        '<div class="wxqr" id="wxQr"></div>'+
+        '<div class="wxstep" id="wxStep1">'+
+          '<div class="wxcodeline">转账时请在<b>「添加转账说明 / 备注」</b>里填写订单码</div>'+
+          '<div class="wxordercode" id="wxOrderCode">------</div>'+
+        '</div>'+
+        '<div class="wxstep" id="wxStep2" style="display:none">'+
+          '<div class="wxspin"></div><div class="wxverifytext">已收到你的付款通知，店主核对到账后立刻出餐，请勿离开…</div>'+
+        '</div>'+
+        '<div class="wxstep" id="wxStepOk" style="display:none">'+
+          '<div class="wxokbig">✓</div>'+
+          '<div class="wxoktitle">已收到，正在出餐</div>'+
+          '<div class="wxoksub">请在取餐口等候，凭订单码 <b id="wxOkCode"></b> 取餐</div>'+
+          '<div class="wxokbtn" id="wxDone">完 成</div>'+
+        '</div>'+
+        '<div class="wxtip" id="wxTip">长按或截图保存收款码 → 微信「扫一扫」识别 → 输入金额并备注订单码</div>'+
+        '<div class="wxbtnrow" id="wxBtnRow"><div class="wxcancel" id="wxCancel">取消</div>'+
+        '<div class="wxok" id="wxPaidBtn">我已转账完成</div></div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+};
+
+function bindPay(p){
+  var amount=ctx.lastPrice||drinkById(ctx.drinkId).price;
+  var itemName=ctx.isAI?ctx.aiName:drinkById(ctx.drinkId).name;
+  var cost=calcCost();
+  var order=null, pollTimer=null;
+  var ov=p.querySelector("#wxOverlay");
+
+  function openQR(){
+    order=ensureOrder(amount,itemName,cost);
+    p.querySelector("#wxAmount").textContent=order.amount;
+    p.querySelector("#wxOrderCode").textContent=order.code;
+    var qr=ownerQr();
+    var qrBox=p.querySelector("#wxQr");
+    if(qr){qrBox.innerHTML='<img src="'+qr+'" alt="店主微信收款码" style="width:196px;height:196px;object-fit:contain">';}
+    else{
+      qrBox.innerHTML='<div class="wxqrph">🧑\u200d💼<div>店主收款码占位</div><small>店主在账本里上传本人收款码后，<br>这里会显示真实微信收款码</small></div>';
+    }
+    p.querySelector("#wxStep1").style.display="block";
+    p.querySelector("#wxStep2").style.display="none";
+    p.querySelector("#wxStepOk").style.display="none";
+    p.querySelector("#wxBtnRow").style.display="flex";
+    p.querySelector("#wxTip").style.display="block";
+    p.querySelector("#wxPaidBtn").textContent="我已转账完成";
+    ov.classList.add("show");
+  }
+  function close(){ov.classList.remove("show");stopPolling();}
+  function stopPolling(){if(pollTimer){clearInterval(pollTimer);pollTimer=null;}}
+  function markPaidUI(){
+    stopPolling();
+    p.querySelector("#wxStep1").style.display="none";
+    p.querySelector("#wxStep2").style.display="none";
+    p.querySelector("#wxStepOk").style.display="block";
+    p.querySelector("#wxOkCode").textContent=order?order.code:"";
+    p.querySelector("#wxTip").style.display="none";
+    p.querySelector("#wxBtnRow").style.display="none";
+    var btn=p.querySelector("#payPrimary");
+    btn.disabled=true;
+    btn.innerHTML='<span class="paycheck">✓</span> 支付成功 · 正在出餐';
+    btn.classList.add("done");
+  }
+  /* 跨标签页：店主在账本核对到账后，订单 status 变 paid，这里立即收到 */
+  function checkPaid(){
+    if(!order)return false;
+    var o=loadOrders().find(function(x){return x.orderId===order.orderId;});
+    if(o&&o.status==="paid"){markPaidUI();return true;}
+    return false;
+  }
+
+  p.querySelector("#payPrimary").onclick=openQR;
+  p.querySelector("#wxCancel").onclick=close;
+  /* 顾客点“我已转账完成”：进入等待核对状态（不立即出餐、不记收入），轮询订单状态 */
+  p.querySelector("#wxPaidBtn").onclick=function(){
+    if(!order)return;
+    p.querySelector("#wxStep1").style.display="none";
+    p.querySelector("#wxTip").style.display="none";
+    p.querySelector("#wxPaidBtn").textContent="等待店主核对…";
+    p.querySelector("#wxStep2").style.display="flex";
+    if(checkPaid())return;
+    stopPolling();
+    pollTimer=setInterval(checkPaid,1200);
+  };
+  var doneBtn=p.querySelector("#wxDone");
+  if(doneBtn)doneBtn.onclick=function(){close();resetHome();};
+  ov.onclick=function(e){if(e.target===ov)close();};
+  window.addEventListener("storage",function(e){
+    if(e.key===ORDKEY&&ov.classList.contains("show"))checkPaid();
+  });
+}
+function bindChat(p){
+  var list=p.querySelector("#chatlist"),input=p.querySelector("#chatinput");
+  function add(role,html){var d=document.createElement("div");d.className="cmsg "+role;
+    d.innerHTML=(role==="ai"?'<div class="cai-av">🍵</div>':'')+'<div class="cb">'+html+'</div>';
+    list.appendChild(d);list.scrollTop=list.scrollHeight;return d;}
+  function say(html,cb){var m=add("ai",'<span class="typing"><i></i><i></i><i></i></span>');var e=m.querySelector(".cb");
+    setTimeout(function(){e.innerHTML=html;list.scrollTop=list.scrollHeight;if(cb)cb(e);},560);}
+  /* 离线兜底起名：严格跟随这句话推导出的成分——不要果汁时绝不出现"橙/果"，不喝奶时绝不出现"乳" */
+  function makeName(t){
+    var noFruit=/不要果汁|不带果汁|不加果|无果汁|别放果|不要水果|不含果|不要橙|不加橙|不要酸|不酸|别酸|不要果味|不带果味/.test(t);
+    var noMilk=/不要奶|不加奶|去奶|无奶|别放奶|不放奶|没奶/.test(t);
+    var milk=!noMilk&&/奶|拿铁|牛乳|丝滑|醇厚|浓郁|温柔|治愈|女生|女孩|少女/.test(t);
+    var fruit=!noFruit&&/橙|橘|维\s*c|补\s*c|vc|c100|水溶|柠檬|酸|果味|果汁/.test(t.toLowerCase());
+    var tea=/乌龙|茉莉|红茶|绿茶|清茶|茶/.test(t);
+    var bag=[];
+    if(/最贵|顶级|豪华|高端|顶配/.test(t))bag.push("金阙","玉盏");
+    if(milk)bag.push("云乳","雪乳","醇白","酥云");
+    if(fruit)bag.push("橙光","橘颂","斜阳");
+    if(tea)bag.push("乌龙","茉上","红窗","绿萼","岩韵");
+    if(/清爽|清新|解腻|通透|提神/.test(t))bag.push("清风","澄光","溪光","初霁");
+    if(/累|疲惫|放松|压力大|治愈|安慰|犒劳|心情不好|难过|郁闷|幸福/.test(t))bag.push("暖云","轻愈","慢享","松风");
+    if(!bag.length)bag=["澄光","清欢","叶露","半山","茶色","晴川"];
+    var tail=["一盏","慢饮","有期","入怀","初见","半盏","闲时","叙","令","引"];
+    /* 近期去重：连点同名也尽量不重样 */
+    if(typeof makeName._used!=="object")makeName._used=[];
+    var cand;
+    for(var i=0;i<14;i++){
+      cand=bag[Math.floor(Math.random()*bag.length)]+tail[Math.floor(Math.random()*tail.length)];
+      if(makeName._used.indexOf(cand)<0)break;
+    }
+    makeName._used.push(cand);
+    if(makeName._used.length>16)makeName._used.shift();
+    return cand;
+  }
+  var rejectPhrases=[
+    "好的，这杯先撤下～再跟我说说你想要的感觉，我重新给你想。",
+    "没问题，我们换一个。你想清爽点、浓郁点，还是换个温度？",
+    "收到，重新来。把你此刻的心情或口味告诉我，我马上再配一杯。"
+  ],rejectN=0;
+  function thinkingBubble(){
+    var m=add("ai",'<span class="typing"><i></i><i></i><i></i></span>');
+    return m.querySelector(".cb");
+  }
+  function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function bindPrevButtons(box,temp){
+    var st=box.querySelector("#aiStart"),rj=box.querySelector("#aiReject");
+    if(st)st.onclick=function(){ctx.drinkId="d1";resetCst(temp);go("config");};
+    if(rj)rj.onclick=function(){say(rejectPhrases[rejectN++%rejectPhrases.length]);};
+  }
+  /* 离线兜底时的本地现调文案（服务没起来也保证 lead/why/layers/benefit 不空，每次随机） */
+  var LOCAL_LEADS=["把此刻的心情，调成一杯。","不必将就，你的口味值得现调。","风过叶尖，恰好是这一杯。","顺手为你，起了个新名字。","今天这杯，想替你说句话。","愿这一口，接住今天的你。","好味道，值得为你重新起笔。","杯里没有将就，只有刚刚好。","今天的风味，为你另起一行。","先敬此刻——这杯为你现调。","愿回甘替我说句：辛苦了。","一杯入喉，万事皆可慢慢来。"],
+    LOCAL_LEAD_USED=[],
+    LOCAL_WHY_M=["茶香先立住分寸，奶香把口感调得顺滑温柔，回甘更舒服。","奶香不抢戏，只是把茶的棱角轻轻收住，喝起来绵密不齁。"],
+    LOCAL_WHY_C=["一丝清亮果酸，酸甜刚好把茶味点亮。","一点果酸让口感更明亮，清爽不寡淡。"],
+    LOCAL_WHY_O=["橙香明亮讨喜，和茶底搭在一起很有元气。","橙香天然清新，让整杯更有层次。"],
+    LOCAL_BEN={milk:"奶香温柔、茶味回甘，累的时候来一杯很治愈、很踏实。",clear:"清透解腻、零负担，犯困或吃撑时最救场。",orange:"橙香明亮，早晨或没精神时来一杯很元气。",hot:"热气裹着茶香，捧在手里、暖到胃里。"};
+  function pickFreshLead(){
+    var avail=LOCAL_LEADS.filter(function(x){return LOCAL_LEAD_USED.indexOf(x)<0;});
+    if(!avail.length){avail=LOCAL_LEADS.slice();LOCAL_LEAD_USED.length=0;}
+    var s=avail[Math.floor(Math.random()*avail.length)];
+    LOCAL_LEAD_USED.push(s);return s;
+  }
+  function localCopy(c2){
+    var hot=c2.temp==="hot",milk=!!cst.milk,
+      fruit=(cst.extra&&cst.extra.orange>0),
+      why="茶香先立住分寸"+(milk?"，奶香慢慢铺开、收住茶的微涩":"")+(fruit?"，再用一点果酸把层次点亮":"")+"；茶味在最后干净回甘。",
+      layers=[
+        milk?"初口奶香温软，轻轻盖住舌尖":fruit?"初口果香明亮，像被晨光叫醒":"初口茶香清冽，像被轻轻叫醒",
+        milk?"中段茶味从奶香里慢慢浮上来":fruit?"中段果酸缓缓铺开，酸甜刚好":"中段茶汤在嘴里转开，清而不淡",
+        hot?"余温顺着喉咙下去，很踏实":"收口干净，留一缕回甘，想再喝一口"
+      ];
+    return {lead:pickFreshLead(),why:why,layers:layers,
+      benefit:hot?LOCAL_BEN.hot:milk?LOCAL_BEN.milk:fruit?LOCAL_BEN.orange:LOCAL_BEN.clear};
+  }
+  /* 点单：图由本地风味分类决定（保证出图稳定），名字与高情商介绍由真模型生成 */
+  function presentOrder(box,rawText,name,desc,c,apology,svc,silent){
+    svc=svc||{};
+    if(!svc.lead){var lc=localCopy(c);svc.lead=lc.lead;svc.why=lc.why;svc.layers=lc.layers;svc.benefit=lc.benefit;if(!svc.temp)svc.temp=c.temp;}
+    ctx.isAI=true;
+    ctx.aiName=esc(name);
+    ctx.aiDesc=esc(desc);
+    /* 完整产品描述：现场现调，每次都不一样——开场短引 / 为什么推荐 / 风味三层 / 这杯的好处 */
+    ctx.aiLead=svc&&svc.lead?esc(svc.lead):"";
+    ctx.aiWhy=svc&&svc.why?esc(svc.why):"";
+    ctx.aiMeaning=svc&&svc.meaning?esc(svc.meaning):"";
+    ctx.aiBenefit=svc&&svc.benefit?esc(svc.benefit):"";
+    ctx.aiLayers=(svc&&svc.layers&&svc.layers.map)?svc.layers.map(function(x){return esc(x);}):[];
+    var temp=(svc&&svc.temp)||c.temp;
+    /* 图片只认编排服务这一条链路返回的 URL（服务端默认豆包 Seedream，无 Key 时服务端自行降级）；
+       服务没给图才退回本地占位，绝不在前端另起第二次出图调用。 */
+    var svcImg=(svc&&svc.image&&svc.image.url)?svc.image.url:"";
+    ctx.aiImg=svcImg||c.img;
+    ctx.aiType=temp;
+    if(svc&&svc.price)ctx.aiPrice=svc.price;
+    /* 无气泡致歉放在最前（机器没有气泡技术），随后照常给无气泡替代方案 */
+    box.innerHTML=(apology?'<p style="margin:0 0 10px;line-height:1.6">'+esc(apology)+'</p>':"")+aiPrevHTML();
+    list.scrollTop=list.scrollHeight;
+    bindPrevButtons(box,temp);
+    /* 原料以编排服务据配方推导出的真实开关为准；服务缺失时才本地推导，绝不出现 4 种之外的东西 */
+    var ingredients;
+    if(svc&&svc.ingredients&&typeof svc.ingredients==="object"){
+      ingredients={
+        tea:svc.ingredients.tea!==false,
+        milk:!!svc.ingredients.milk,
+        c:!!svc.ingredients.c,
+        orange:!!svc.ingredients.orange,
+        ice:svc.ingredients.ice!==false&&temp!=="hot"
+      };
+    }else{
+      /* 离线推导：先尊重否定（不要奶/不要果汁），再看明确口味，最后才用本地分类，绝不硬塞橙 */
+      var tl=rawText.toLowerCase();
+      var noMilk=/不要奶|不加奶|去奶|无奶|别放奶|不放奶|没奶/.test(tl);
+      var noFruit=/不要果汁|不带果汁|不加果|无果汁|别放果|不要水果|不含果|不要橙|不加橙|别放橙|不要酸|不酸|别酸|不要果味|不带果味/.test(tl);
+      var wantMilk=!noMilk&&((cst.milk>0)||/奶|拿铁|牛乳/.test(tl));
+      var sayOrange=!noFruit&&/橙|橘|维生素|c100|水溶|补\s*c|维\s*c|果味|果汁/.test(tl);
+      var sayC=!noFruit&&/水溶|c100|维c|补c|酸|清爽|清新|解腻|醒/.test(tl);
+      var wantOrange=!noFruit&&(sayOrange||(!/不要|不加|别|无|不/.test(tl)&&(c.type==="default"||c.type==="moodHappy")));
+      var wantC=!noFruit&&(sayC||(wantOrange&&/清爽|清新/.test(tl)));
+      ingredients={ tea:true, milk:wantMilk, c:wantC, orange:!!wantOrange, ice:temp!=="hot" };
+    }
+    if(svcImg){
+      /* 服务已端到端出好图：加载完成淡入，失败提示但不阻断下单 */
+      var im0=box.querySelector("#genImg");
+      if(im0){im0.src=svcImg;}
+    }else{
+      /* 服务未出图（如未启动）：本地风味占位秒开，再让前端兜底出图热替换，不影响下单 */
+      var seed=seedOf(rawText+name);
+      IMGAI.generate({
+        name:name, desc:(desc||c.desc||""), mood:rawText,
+        ingredients:ingredients, temp:temp, seed:seed
+      }).then(function(r){
+        if(!r||!r.url)return;
+        ctx.aiImg=r.url;
+        var im=box.querySelector("#genImg");
+        if(im)im.src=r.url;
+      }).catch(function(){});
+    }
+    /* 存入调配记录（复刻的单子不重复存） */
+    if(!silent){
+      try{
+        HISTORY.save({
+          name:name,desc:desc||"",query:rawText,
+          temp:temp,ice:svc.ice||c.ice||"",sugar:svc.sugar||c.sugar||"",
+          price:ctx.aiPrice||0,image:ctx.aiImg||"",ingredients:ingredients,
+          svc:{lead:svc.lead,why:svc.why,layers:svc.layers,benefit:svc.benefit,meaning:svc.meaning,
+               temp:temp,ingredients:ingredients,image:{url:ctx.aiImg||""},price:ctx.aiPrice||0,
+               ice:svc.ice||c.ice||"",sugar:svc.sugar||c.sugar||""}
+        });
+      }catch(e){}
+    }
+  }
+  /* 复刻历史那一杯（不再请求 AI，直接用存档全套） */
+  function replayHistory(box,r,sayText){
+    resetCst(r.temp==="hot"?"hot":(r.temp==="normal"?"normal":"cold"));
+    cst.temp=r.temp==="hot"?"hot":(r.temp==="normal"?"normal":"cold");
+    var fakeC={type:"history",temp:cst.temp,ice:r.ice||"",sugar:r.sugar||"",
+      img:r.image||"",desc:r.desc||"",ingredients:r.ingredients||{tea:true}};
+    if(r.price)ctx.aiPrice=r.price;
+    presentOrder(box,sayText||("再来一杯「"+r.name+"」"),r.name,r.desc||"",fakeC,null,r.svc,true);
+  }
+  window.__replayHistory=function(r){
+    var page=stack[stack.length-1].el,list2=page.querySelector("#chatlist");
+    var box2=add("ai","");var bubble=box2.querySelector(".cb");
+    replayHistory(bubble,r);
+    list2.scrollTop=list2.scrollHeight;
+  };
+  function send(){
+    var t=input.value.trim();if(!t)return;
+    add("user",esc(t));input.value="";
+    var box=thinkingBubble();
+    /* 历史召回：用户点名字 / 说配料 / 说"上次那杯" → 先在本地记录里找 */
+    var hit=HISTORY.detect(t);
+    if(hit&&hit.kind!=="guess"){
+      replayHistory(box,hit.rec,t);
+      return;
+    }
+    if(hit&&hit.candidates&&hit.candidates.length){
+      box.innerHTML='<div class="recguess" style="margin:0"><h4>我猜你说的是之前这杯，点一下就为你重做：</h4>'+
+        hit.candidates.map(function(r,i){
+          return '<div class="gitem" data-gid="'+i+'">'+
+            (r.image?'<img src="'+r.image+'" onerror="this.style.visibility=\'hidden\'">':'<img>')+
+            '<div style="flex:1;min-width:0"><div class="gn">'+esc(r.name)+'</div>'+
+            '<div class="gs">'+esc(recSub(r))+' · '+recTime(r.ts)+'</div></div><div style="color:#9aa096">›</div></div>';
+        }).join("")+'</div>';
+      list.scrollTop=list.scrollHeight;
+      var gitems=box.querySelectorAll(".gitem");
+      for(var gi=0;gi<gitems.length;gi++){(function(idx){
+        gitems[idx].onclick=function(){replayHistory(box,hit.candidates[idx],t);};
+      })(gi);}
+      return;
+    }
+    /* 唯一主链路：一句话 → 编排服务 /api/drink 内部完成理解/起名/文案/配方/致歉/豆包出图，一次返回全套。
+       服务不可达 / 超时 → 退回本地规则(TEXTAI 独立后端 + classify)，原型离线也能点，绝不卡住。 */
+    DRINKAI.order(t).then(function(raw){
+      var d=raw?DRINKAI.shape(raw,t):null;
+      if(d&&d.ai&&d.order){
+        /* —— 编排服务一条龙结果 —— */
+        var c=classify(t);
+        var temp=d.temp||c.temp;
+        resetCst(temp);
+        if(temp)cst.temp=temp;
+        applyMods(d.mods);                /* 奶量/橙汁/温度以服务据配方的推导为准 */
+        if(d.price)ctx.aiPrice=d.price;
+        if(!ctx.aiTier)ctx.aiTier=0;
+        presentOrder(box,t,d.name||makeName(t),d.desc||c.desc,c,d.apology,d);
+        return;
+      }
+      if(d&&d.ai&&d.order===false){
+        box.innerHTML=esc(d.reply||chatReply(t)).replace(/\n/g,"<br>");
+        list.scrollTop=list.scrollHeight;
+        return;
+      }
+      /* —— 本地/独立后端兜底（编排服务没起来时） —— */
+      TEXTAI.understand(t).then(function(u){
+        var isOrder,aiName,aiDesc,replyText,mods;
+        if(u&&u.ai){
+          isOrder=u.order;aiName=u.name;aiDesc=u.desc;replyText=u.reply;mods=u.mods;
+        }else{
+          var intent=detectIntent(t);
+          isOrder=intent.order;replyText=intent.reply||"";
+          if(isOrder)mods=parseMods(t);   /* 断网时也本地解析“最贵/不要奶”等 */
+        }
+        if(isOrder){
+          var c2=classify(t);               /* 仅用于定出图风格与温度 */
+          resetCst(c2.temp);
+          if(c2.temp)cst.temp=c2.temp;
+          applyMods(mods);
+          if(!ctx.aiTier)ctx.aiTier=0;
+          presentOrder(box,t,aiName||makeName(t),aiDesc||c2.desc,c2,u&&u.apology);
+        }else{
+          box.innerHTML=esc(replyText||chatReply(t)).replace(/\n/g,"<br>");
+          list.scrollTop=list.scrollHeight;
+        }
+      });
+    });
+  }
+  p.querySelector("#chatsend").onclick=send;
+  input.addEventListener("keydown",function(e){if(e.key==="Enter")send();});
+  /* 欢迎词：每次进入 AI 配比都现挑一条，且明确"每一杯都是现场现调、绝不重样" */
+  var welcomes=[
+    "嗨，欢迎回来～<br>一杯好茶，清有清的透亮，醇有醇的温柔，冰热酸甜都能随你此刻的心情走。<br>今天想喝点什么感觉？说一句话就行。",
+    "你来啦，先别急。<br>累了、腻了、想开心一下，哪怕只说“随便”，我也给你一杯不重样的好喝的。",
+    "欢迎光临～<br>清爽的、醇厚的、热乎的、明亮的，你说出口的那句，就是这一杯的灵魂。",
+    "嗨～今天这杯，注定和你上次喝的不一样。<br>茶香、奶香、果香能转出很多种惊喜，说说看，你想要什么感觉？",
+    "你好呀，我是你的专属调配师。<br>口味、心情、预算、忌口都可以说，比如“来个贵一点的、不要奶”，剩下的交给我，保证好喝又好看。",
+    "见到你真高兴～<br>每一杯都是听你说完才动手，新鲜得刚刚好。现在的你，想被清爽叫醒，还是想被温柔接住？",
+    "嗨，今天过得怎么样？<br>不管顺不顺，先把心情交给我——清清爽爽，或温温柔柔，我都能给你调成一杯好喝的。",
+    "欢迎光临～<br>想喝什么直接开口，模糊一点也没关系，“随便来点”“解解腻”“热乎点”，我都听得懂、做得出。",
+    "嘿，准备好被一杯饮料懂一下了吗？<br>说说口味或心情，这杯的名字和味道，都会跟着你这句话长出来。",
+    "你来啦～<br>好味道值得现做：你一句话，我马上给你变出一杯专属的，名字也是为这一杯新起的。",
+    "嗨～今天想清爽利落，还是醇厚治愈？<br>没有标准答案，你说出来的那句最重要，我负责把它做到最好喝。",
+    "欢迎呀。<br>茶香清透、奶香丝滑、果香明亮，浓淡冰热样样都有——告诉我你此刻想要的味道就好。"
+  ];
+  say(welcomes[Math.floor(Math.random()*welcomes.length)]);
+}
+
+/* 记录页：点一条 → 进 AI 配比并直接重做这杯 */
+function bindHistory(p){
+  var cards=p.querySelectorAll(".reccard");
+  for(var i=0;i<cards.length;i++){(function(card){
+    card.onclick=function(){
+      var r=HISTORY.get(card.getAttribute("data-hid"));
+      if(!r)return;
+      go("ai");
+      setTimeout(function(){if(window.__replayHistory)window.__replayHistory(r);},320);
+    };
+  })(cards[i]);}
+}
+
+/* 回到默认调配状态（AI 单开始前也用它重置） */
+function resetCst(temp){
+  cst={milk:2,mtype:"cow",sugar:2,extra:{pearl:0,coconut:0,orange:2},temp:temp||"cold"};
+}
+/* 把 AI/本地解析出的偏好落到 cst 与 ctx（价格档位/目标预算） */
+function applyMods(m){
+  if(!m)return;
+  if(typeof m.milk==="number"&&m.milk>=0&&m.milk<=3)cst.milk=m.milk;
+  if(m.mtype&&MILKTYPES[m.mtype])cst.mtype=m.mtype;
+  if(typeof m.sugar==="number"&&m.sugar>=0&&m.sugar<=3)cst.sugar=m.sugar;
+  if(typeof m.temp==="string"&&/cold|normal|hot/.test(m.temp))cst.temp=m.temp;
+  ["pearl","coconut","orange"].forEach(function(k){
+    if(typeof m[k]==="number"&&m[k]>=0&&m[k]<=3)cst.extra[k]=m[k];
+  });
+  if(typeof m.tier==="number"&&m.tier>=0&&m.tier<=3)ctx.aiTier=m.tier;
+  if(typeof m.budget==="number"&&m.budget>0)ctx.targetBudget=m.budget;
+}
+
+/* ==================================================================
+   页面导航框架：页面栈 stack + mount/go/back/chrome
+   ================================================================== */
+var stack=[];
+var META={
+  home:{t:"",bar:false,noBack:true},
+  daily:{t:"每日推荐"},
+  ai:{t:"AI 配比"},
+  history:{t:"调 配 记 录"},
+  select:{t:"饮品选择"},
+  config:{t:"调 配"},
+  pay:{t:"收 银 台"}
+};
+var pagesEl=document.getElementById("pages");
+var navEl=document.getElementById("navbar");
+function mount(name){
+  var el=document.createElement("div");
+  el.className="page";
+  el.innerHTML=T[name]();
+  pagesEl.appendChild(el);
+  bind(name,el);
+  return el;
+}
+function bind(name,p){
+  if(name==="home")bindHome(p);
+  else if(name==="daily")bindDaily(p);
+  else if(name==="ai")bindChat(p);
+  else if(name==="history")bindHistory(p);
+  else if(name==="select")bindSelect(p);
+  else if(name==="config")bindConfig(p);
+  else if(name==="pay")bindPay(p);
+}
+function chrome(name){
+  var m=META[name]||{t:""};
+  if(m.bar===false){navEl.style.visibility="hidden";return;}
+  navEl.style.visibility="visible";
+  var backHTML=(stack.length>1&&!m.noBack)?'<span class="back" id="navBack">‹</span>':"";
+  var recHTML=(name==="ai")?'<span class="navrec" id="navRec">记录<span class="rn" id="navRecN">0</span></span>':"";
+  navEl.innerHTML=backHTML+'<span id="navtitle">'+(m.t||"")+'</span>'+recHTML;
+  var b=navEl.querySelector("#navBack");
+  if(b)b.onclick=back;   /* 绑定全局返回函数 back()；局部字符串变量已改名 backHTML，避免 var 提升遮蔽 */
+  var r=navEl.querySelector("#navRec");
+  if(r){refreshRecBadge();r.onclick=function(){go("history");};}
+}
+function go(name){
+  var el=mount(name);
+  stack.push({name:name,el:el});
+  requestAnimationFrame(function(){el.classList.add("show");});
+  chrome(name);
+}
+function back(){
+  if(stack.length<=1)return;
+  var cur=stack.pop();
+  cur.el.classList.remove("show");
+  setTimeout(function(){if(cur.el.parentNode)cur.el.parentNode.removeChild(cur.el);},260);
+  var top=stack[stack.length-1];
+  chrome(top.name);
+}
+/* 清空栈直接回首页（扫码进入/支付后重置用） */
+function resetHome(){
+  while(stack.length>1){
+    var x=stack.pop();
+    if(x.el.parentNode)x.el.parentNode.removeChild(x.el);
+  }
+  var top=stack[0];
+  if(top){top.el.classList.add("show");chrome("home");}
+}
+
+/* ---------- 首页 ---------- */
+function bindHome(p){
+  p.querySelectorAll(".hopt[data-go], [data-go]").forEach(function(el){
+    el.onclick=function(){go(el.getAttribute("data-go"));};
+  });
+}
+/* ---------- 每日推荐 ---------- */
+function bindDaily(p){
+  var btn=p.querySelector('[data-go="config"]');
+  if(btn)btn.onclick=function(){
+    var d=drinkById(ctx.drinkId);
+    resetCst();
+    ctx.isAI=false;ctx.aiTier=0;ctx.targetBudget=0;
+    ctx.lastPrice=d.price;
+    go("config");
+  };
+  /* 每日推荐文案：真模型现生成（失败用默认 reason 兜底），按天缓存 */
+  var pitch=p.querySelector("#dailyPitch");
+  if(pitch&&window.TEXTAI){
+    var d=drinkById(ctx.drinkId),cacheKey="daily_pitch_"+todayStr()+"_"+d.id;
+    var cached=null;try{cached=localStorage.getItem(cacheKey);}catch(e){}
+    if(cached){pitch.textContent=cached;}
+    else{
+      TEXTAI.pitch(d.name,d.en,d.price,d.reason).then(function(txt){
+        if(txt&&pitch){pitch.textContent=txt;try{localStorage.setItem(cacheKey,txt);}catch(e){}}
+      }).catch(function(){});
+    }
+  }
+}
+/* ---------- 饮品选择 ---------- */
+function bindSelect(p){
+  p.querySelectorAll("[data-drink]").forEach(function(el){
+    el.onclick=function(){
+      ctx.drinkId=el.getAttribute("data-drink");
+      ctx.isAI=false;ctx.aiTier=0;ctx.targetBudget=0;
+      resetCst();
+      ctx.lastPrice=drinkById(ctx.drinkId).price;
+      go("config");
+    };
+  });
+}
+/* ---------- 调配 ---------- */
+function bindConfig(p){
+  function refreshSegs(){
+    p.querySelectorAll(".seg[data-g]").forEach(function(seg){
+      var g=seg.getAttribute("data-g");
+      seg.querySelectorAll("button").forEach(function(b){
+        var v=b.getAttribute("data-v");
+        var on;
+        if(g==="temp")on=(cst.temp===v);
+        else if(g==="mtype")on=(cst.mtype===v);
+        else on=(String(cst[g])===v);
+        b.classList.toggle("on",!!on);
+      });
+    });
+    p.querySelectorAll(".seg[data-tg]").forEach(function(seg){
+      var k=seg.getAttribute("data-tg");
+      seg.querySelectorAll("button").forEach(function(b){
+        b.classList.toggle("on",String(cst.extra[k])===b.getAttribute("data-v"));
+      });
+    });
+  }
+  p.querySelectorAll(".seg[data-g]").forEach(function(seg){
+    seg.onclick=function(e){
+      var b=e.target.closest("button");if(!b)return;
+      var g=seg.getAttribute("data-g"),v=b.getAttribute("data-v");
+      if(g==="temp")cst.temp=v;
+      else if(g==="mtype")cst.mtype=v;
+      else cst[g]=parseInt(v,10);
+      var pr=calcPrice();ctx.lastPrice=pr.total;
+      refreshSegs();refreshSum();
+    };
+  });
+  p.querySelectorAll(".seg[data-tg]").forEach(function(seg){
+    seg.onclick=function(e){
+      var b=e.target.closest("button");if(!b)return;
+      var k=seg.getAttribute("data-tg");
+      cst.extra[k]=parseInt(b.getAttribute("data-v"),10);
+      var pr=calcPrice();ctx.lastPrice=pr.total;
+      refreshSegs();refreshSum();
+    };
+  });
+  var pr=calcPrice();ctx.lastPrice=pr.total;refreshSum();
+  var tp=p.querySelector("#toPay");
+  if(tp)tp.onclick=function(){go("pay");};
+}
+
+stack.push({name:"home",el:mount("home")});
+requestAnimationFrame(function(){stack[0].el.classList.add("show");});
+chrome("home");
+</script>
+</body>
+</html>
